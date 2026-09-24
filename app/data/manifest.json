@@ -1,0 +1,1053 @@
+{
+ "prior": "rl",
+ "method": "mwpm_gap",
+ "keep_grid": [
+  0.05,
+  0.1,
+  0.15,
+  0.2,
+  0.25,
+  0.3,
+  0.35,
+  0.4,
+  0.45,
+  0.5,
+  0.55,
+  0.6,
+  0.65,
+  0.7,
+  0.75,
+  0.8,
+  0.85,
+  0.9,
+  0.95,
+  1.0
+ ],
+ "experiments": [
+  {
+   "key": "d3_at_q10_7/X/r01",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/X/r10",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/X/r30",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/X/r50",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/Z/r01",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/Z/r10",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/Z/r30",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q10_7/Z/r50",
+   "distance": 3,
+   "patch": "q10_7",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/X/r01",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/X/r10",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/X/r30",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/X/r50",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/Z/r01",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/Z/r10",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/Z/r30",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q2_7/Z/r50",
+   "distance": 3,
+   "patch": "q2_7",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/X/r01",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/X/r10",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/X/r30",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/X/r50",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/Z/r01",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/Z/r10",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/Z/r30",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_5/Z/r50",
+   "distance": 3,
+   "patch": "q4_5",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/X/r01",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/X/r10",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/X/r30",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/X/r50",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/Z/r01",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/Z/r10",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/Z/r30",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q4_9/Z/r50",
+   "distance": 3,
+   "patch": "q4_9",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/X/r01",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/X/r10",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/X/r30",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/X/r50",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/Z/r01",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/Z/r10",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/Z/r30",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_11/Z/r50",
+   "distance": 3,
+   "patch": "q6_11",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/X/r01",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/X/r10",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/X/r30",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/X/r50",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/Z/r01",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/Z/r10",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/Z/r30",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_3/Z/r50",
+   "distance": 3,
+   "patch": "q6_3",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/X/r01",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/X/r10",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/X/r30",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/X/r50",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/Z/r01",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/Z/r10",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/Z/r30",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q6_7/Z/r50",
+   "distance": 3,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/X/r01",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/X/r10",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/X/r30",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/X/r50",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/Z/r01",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/Z/r10",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/Z/r30",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_5/Z/r50",
+   "distance": 3,
+   "patch": "q8_5",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/X/r01",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/X/r10",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/X/r30",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/X/r50",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/Z/r01",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/Z/r10",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/Z/r30",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d3_at_q8_9/Z/r50",
+   "distance": 3,
+   "patch": "q8_9",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/X/r01",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/X/r10",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/X/r30",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/X/r50",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/Z/r01",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/Z/r10",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/Z/r30",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q4_7/Z/r50",
+   "distance": 5,
+   "patch": "q4_7",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/X/r01",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/X/r10",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/X/r30",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/X/r50",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/Z/r01",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/Z/r10",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/Z/r30",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_5/Z/r50",
+   "distance": 5,
+   "patch": "q6_5",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/X/r01",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/X/r10",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/X/r30",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/X/r50",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/Z/r01",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/Z/r10",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/Z/r30",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q6_9/Z/r50",
+   "distance": 5,
+   "patch": "q6_9",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/X/r01",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/X/r10",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/X/r30",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/X/r50",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/Z/r01",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/Z/r10",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/Z/r30",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d5_at_q8_7/Z/r50",
+   "distance": 5,
+   "patch": "q8_7",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/X/r01",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/X/r10",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/X/r30",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/X/r50",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "X",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/Z/r01",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 1,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/Z/r10",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 10,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/Z/r30",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 30,
+   "n_cal": 15000,
+   "n_test": 15000
+  },
+  {
+   "key": "d7_at_q6_7/Z/r50",
+   "distance": 7,
+   "patch": "q6_7",
+   "basis": "Z",
+   "rounds": 50,
+   "n_cal": 15000,
+   "n_test": 15000
+  }
+ ],
+ "explorer": [
+  "d3_at_q6_7/Z/r01",
+  "d3_at_q6_7/X/r10",
+  "d3_at_q6_7/Z/r10",
+  "d5_at_q6_5/X/r10",
+  "d5_at_q6_5/Z/r10",
+  "d7_at_q6_7/X/r10",
+  "d7_at_q6_7/Z/r10",
+  "d7_at_q6_7/Z/r30"
+ ],
+ "pathways": [
+  "correlated_matching_decoder_with_si1000_prior",
+  "correlated_matching_decoder_with_rl_optimized_prior",
+  "harmony_decoder_with_si1000_prior",
+  "harmony_decoder_with_rl_optimized_prior",
+  "libra_decoder_with_rl_optimized_prior"
+ ]
+}

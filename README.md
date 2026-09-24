@@ -6,7 +6,7 @@ Planning documents live one folder up: `qec-decoder-calibration-spec.md` (the sp
 
 ## Status
 
-M0, M1 and M2 done; M4 (RQ1, RQ2) and the M5 drift study (RQ3) done for the MWPM gap: `results/m4_summary.md`, `results/m5_summary.md`. Next: web app (M5), then belief-matching gap and learned decoder (M3).
+M0, M1 and M2 done; M4 (RQ1, RQ2) and M5 (drift study, RQ3, web app) done for the MWPM gap: `results/m4_summary.md`, `results/m5_summary.md`, `app/`. Next: deploy the app, then the belief-matching gap and the learned decoder (M3).
 
 ## Quick start
 
@@ -26,6 +26,8 @@ python scripts/m4_calibrate_certify.py         # calibrators (Train), Learn-then
 python scripts/m4_summary.py                   # RQ1 / RQ2 tables and figures -> results/
 python scripts/m5_drift.py                     # RQ3: certify on a source, evaluate on a shifted target (~2 min)
 python scripts/m5_summary.py                   # RQ3 tables and figures -> results/
+python scripts/build_app_data.py               # small committed data for the web app -> app/data/
+streamlit run app/streamlit_app.py             # web app (deployment: docs/app.md)
 python -m pytest -q
 ```
 
@@ -41,7 +43,7 @@ src/qeccal/    data, dem, decoders, exact, soft, calibration, guarantees, learne
 scripts/       one script per figure or table; check_env, inspect_archive, m0_threshold
 notebooks/     exploration only, never load-bearing
 results/       committed metrics and figures
-app/           web app (M5)
+app/           Streamlit web app and its data (docs/app.md)
 tests/         pytest
 ```
 

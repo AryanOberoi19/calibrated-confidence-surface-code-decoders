@@ -1,0 +1,8 @@
+# Web app only (Streamlit Community Cloud reads this file because it sits next to the entrypoint).
+streamlit==1.64.0
+plotly==7.1.0
+pandas==3.0.6
+numpy==2.2.6
+scipy==1.17.1
+stim==1.16.0
+pymatching==2.4.0
