@@ -20,6 +20,8 @@ python scripts/make_splits.py                  # rewrites splits/splits_v1.json 
 python scripts/m1_baselines.py                 # PyMatching vs Google's decoders, all 420 experiments (~12 min on an M4 Pro)
 python scripts/m1_summary.py                   # per-cycle error, Lambda, figures -> results/
 python scripts/alpha_floor.py                  # smallest certifiable alpha -> results/
+python scripts/m2_soft_outputs.py              # MWPM gap (all) and exact posterior (r=1), per-shot cache (~10 min)
+python scripts/m2_summary.py                   # error vs discard and calibration on the Train split -> results/
 python -m pytest -q
 ```
 
