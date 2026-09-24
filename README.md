@@ -6,7 +6,7 @@ Planning documents live one folder up: `qec-decoder-calibration-spec.md` (the sp
 
 ## Status
 
-M0, M1 and M2 done; M4 done for the MWPM gap (`results/m4_summary.md`). Next: belief-matching gap, learned decoder (M3), drift study and web app (M5).
+M0, M1 and M2 done; M4 (RQ1, RQ2) and the M5 drift study (RQ3) done for the MWPM gap: `results/m4_summary.md`, `results/m5_summary.md`. Next: web app (M5), then belief-matching gap and learned decoder (M3).
 
 ## Quick start
 
@@ -24,6 +24,8 @@ python scripts/m2_soft_outputs.py              # MWPM gap (all) and exact poster
 python scripts/m2_summary.py                   # error vs discard and calibration on the Train split -> results/
 python scripts/m4_calibrate_certify.py         # calibrators (Train), Learn-then-Test (Calibrate), evaluation (Test)
 python scripts/m4_summary.py                   # RQ1 / RQ2 tables and figures -> results/
+python scripts/m5_drift.py                     # RQ3: certify on a source, evaluate on a shifted target (~2 min)
+python scripts/m5_summary.py                   # RQ3 tables and figures -> results/
 python -m pytest -q
 ```
 

@@ -66,3 +66,19 @@ def loosest_where(values, ok) -> int | None:
 def cp_lower(e: int, n: int, level: float = 0.95) -> float:
     """One-sided Clopper-Pearson lower bound on a rate from e errors in n shots."""
     return 0.0 if e == 0 or n == 0 else float(beta.ppf(1 - level, e, n - e + 1))
+
+
+def certify(s_train, s_cal, wrong_cal, alpha, delta, keep_grid=KEEP_GRID):
+    """Learn-then-Test on one source: (threshold lambda, keep fraction) of the loosest certified threshold, or None."""
+    lams = thresholds(s_train, keep_grid)
+    i, _ = learn_then_test(s_cal, wrong_cal, lams, alpha, delta, keep_grid)
+    return None if i is None else (float(lams[i]), float(keep_grid[i]))
+
+
+def evaluate(lam, s_test, wrong_test, alpha) -> dict:
+    """Kept count, errors, rate and exceedance flags of threshold lam on a (possibly different) target's Test shots."""
+    kept = np.asarray(s_test) >= lam
+    n, e = int(kept.sum()), int(np.asarray(wrong_test, bool)[kept].sum())
+    rate = e / n if n else float("nan")
+    return {"n": n, "errors": e, "rate": rate, "exceed": int(n > 0 and rate > alpha),
+            "sig_exceed": int(cp_lower(e, n) > alpha)}

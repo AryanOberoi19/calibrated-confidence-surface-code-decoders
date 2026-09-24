@@ -90,3 +90,11 @@ class LogicalGap:
             pred[s:s + chunk] = w1 < w0
             gap[s:s + chunk] = np.abs(w1 - w0)
         return pred, gap
+
+
+def sample_gap(dem: stim.DetectorErrorModel, shots: int, seed: int):
+    """Simulate shots from the DEM itself and decode them: (gap, wrong) as if the DEM were the true noise.
+    Used as the source side of the simulation-to-hardware shift (spec section 8.7)."""
+    det, obs, _ = dem.compile_sampler(seed=seed).sample(shots)
+    pred, gap = LogicalGap(dem).decode(det)
+    return gap, pred != obs[:, 0]
