@@ -6,7 +6,7 @@ Planning documents live one folder up: `qec-decoder-calibration-spec.md` (the sp
 
 ## Status
 
-M0 (environment) done. M1 (real data): archive verified, loader and splits fixed, baseline validation against Google's released decoders in `results/m1_summary.md`.
+M0, M1 and M2 done; M4 done for the MWPM gap (`results/m4_summary.md`). Next: belief-matching gap, learned decoder (M3), drift study and web app (M5).
 
 ## Quick start
 
@@ -22,6 +22,8 @@ python scripts/m1_summary.py                   # per-cycle error, Lambda, figure
 python scripts/alpha_floor.py                  # smallest certifiable alpha -> results/
 python scripts/m2_soft_outputs.py              # MWPM gap (all) and exact posterior (r=1), per-shot cache (~10 min)
 python scripts/m2_summary.py                   # error vs discard and calibration on the Train split -> results/
+python scripts/m4_calibrate_certify.py         # calibrators (Train), Learn-then-Test (Calibrate), evaluation (Test)
+python scripts/m4_summary.py                   # RQ1 / RQ2 tables and figures -> results/
 python -m pytest -q
 ```
 
