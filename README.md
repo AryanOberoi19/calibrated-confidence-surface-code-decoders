@@ -6,7 +6,7 @@ Planning documents live one folder up: `qec-decoder-calibration-spec.md` (the sp
 
 ## Status
 
-Milestone M0 (environment) and M1 (real data) in progress.
+M0 (environment) done. M1 (real data): archive verified, loader and splits fixed, baseline validation against Google's released decoders in `results/m1_summary.md`.
 
 ## Quick start
 
@@ -14,8 +14,12 @@ Milestone M0 (environment) and M1 (real data) in progress.
 python3.12 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt && pip install -e .
 python scripts/check_env.py                    # environment check
-python scripts/inspect_archive.py data/raw/google_105Q_surface_code_d3_d5_d7.zip --md5
 python scripts/m0_threshold.py                 # M0 threshold plot -> results/
+# data: download, verify and extract as in docs/data.md, then
+python scripts/make_splits.py                  # rewrites splits/splits_v1.json (already committed)
+python scripts/m1_baselines.py                 # PyMatching vs Google's decoders, all 420 experiments (~12 min on an M4 Pro)
+python scripts/m1_summary.py                   # per-cycle error, Lambda, figures -> results/
+python scripts/alpha_floor.py                  # smallest certifiable alpha -> results/
 python -m pytest -q
 ```
 
@@ -25,8 +29,8 @@ Details: `docs/environment.md` (setup) and `docs/data.md` (dataset).
 
 ```
 docs/          environment.md, data.md, generated data inventory
-data/raw/      the Zenodo archive (git-ignored)
-splits/        committed split indices and seeds
+data/raw/      the extracted Zenodo archive (git-ignored)
+splits/        committed split manifest (seed, shares, per-experiment checksums)
 src/qeccal/    data, dem, decoders, exact, soft, calibration, guarantees, learned
 scripts/       one script per figure or table; check_env, inspect_archive, m0_threshold
 notebooks/     exploration only, never load-bearing

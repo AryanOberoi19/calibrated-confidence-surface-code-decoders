@@ -20,7 +20,7 @@ python scripts/inspect_archive.py data/raw/google_105Q_surface_code_d3_d5_d7.zip
 python scripts/data_checks.py     data/raw/google_105Q_surface_code_d3_d5_d7.zip
 ```
 
-The first script saves the archive's own README to `docs/archive_README.txt` and writes `docs/data_inventory.md` and `docs/data_inventory.json`. The second checks the logical-gap precondition and tabulates Google's own decoder results, writing `docs/data_checks.md`.
+Both scripts read the zip. After them, extract the zip into `data/raw/`; everything else reads the extracted folder, and the zip can be deleted. The first script saves the archive's own README to `docs/archive_README.txt` and writes `docs/data_inventory.md` and `docs/data_inventory.json`. The second checks the logical-gap precondition and tabulates Google's own decoder results, writing `docs/data_checks.md`.
 
 ## Confirmed facts (from the inventory, the archive README and data_checks)
 
@@ -37,18 +37,34 @@ The first script saves the archive's own README to `docs/archive_README.txt` and
 | Is shot order within a file acquisition order? (metadata / README) | Not established. `metadata.json` has only basis, rounds, shots, distance and qubit coordinates, with no timestamps, and the README says nothing about shot order. |
 | Does the logical-gap precondition hold on these circuits? | Yes. There are 0 violations across the 420 SI1000 DEMs built from the noisy circuits and the 840 distinct shipped DEMs (see `docs/data_checks.md`). |
 
-## Implications for the plan (to discuss; not yet decided)
+## Decisions (24 September 2026)
 
-- **r=13 is in-sample for the RL prior.** Any result that uses the RL-optimized DEM should leave r=13 out of test and calibration. Libra is also absent at r=1 and r=13.
-- **The "fitted DEM" in spec 8.2 already exists.** The shipped RL-optimized DEM is a hardware-fitted prior, so fitting our own becomes optional.
-- **Acquisition-order drift (spec 8.7) can't be supported from the data as released,** because nothing ties shot order to time. The drift axes that remain are patch, basis, round count and simulation → hardware.
-- **Wording:** the spec and report say "rotated surface code". This is the XZZX variant of the rotated layout, so the text should say so.
-- **M1 targets:** `docs/data_checks.md` tabulates Google's error fractions per pathway. Our loader plus PyMatching with the SI1000 DEM should land close to `correlated_matching_decoder_with_si1000_prior`. With correlations off, expect it to be slightly worse. With `enable_correlations=True`, it should be closer still.
+| Decision | Value |
+|---|---|
+| r=13 | Held out. Every r=13 shot has the role `sanity`: decoder sanity checks only, never Calibrate or Test, because the RL-optimized prior was fitted on the 13-cycle data. Libra is also absent at r=1 and r=13. |
+| Fitted DEM | Google's shipped RL-optimized prior (`Experiment.dem("rl")`). We do not fit our own; the p_ij estimator is an optional stretch goal. Prior DEM: the shipped SI1000 DEM (`Experiment.dem("si1000")`). |
+| Split shares (Train / Calibrate / Test) | 40 / 30 / 30 per experiment (20,000 / 15,000 / 15,000 shots) |
+| Split method and seed | Seeded permutation per experiment, seed 20260924 combined with a hash of the experiment key (`qeccal.data.splits`). Manifest with per-experiment checksums: `splits/splits_v1.json` (`python scripts/make_splits.py`). |
+| Round counts | All 15 are loaded. r=13 is held out as above, and r=1 is excluded from per-cycle fits. Which round counts each analysis uses is stated in that analysis's script. |
+| Shift axes | Patch, basis and simulation → hardware. Acquisition order is dropped: no timestamps, and the README does not say that file order is time order. |
+| Wording | The code is the XZZX variant of the rotated surface code. |
 
-## Decisions (record before any analysis)
+## Observations from M1 (`results/m1_baselines.csv`)
 
-| Decision | Value | Date |
-|---|---|---|
-| Round counts used, per distance | | |
-| Split shares (Train / Calibrate / Test) | 40 / 30 / 30 (provisional) | |
-| Split seed | | |
+- Logical error per shot does not always rise with round count by more than shot noise allows. For example, plain MWPM with the RL prior on `d7_at_q6_7/Z` gives 29.9% at r=90 and 29.5% at r=110 (standard error about 0.2%), and the same flat or falling step from r=90 to r=110 appears in several d=5 Z-basis patches. Treat each round count as a separately acquired experiment, and read per-cycle fits as approximate.
+- Our correlated PyMatching, run with Google's shipped DEM, lands 2-7% above Google's correlated matching in per-cycle error, and agrees with it on 97.6-99.3% of shots at r=10 (`results/m1_summary.md`).
+
+## Loading
+
+```python
+from qeccal.data import list_experiments, get_experiment, split_indices
+
+e = get_experiment("d5_at_q6_5/X/r50")
+det = e.detection_events()            # (50000, 1200) bool; packed=True for PyMatching's bit_packed_shots
+obs = e.observable_flips()            # (50000,) bool, the ground truth
+dem = e.dem("rl")                     # or "si1000", or "si1000_circuit"
+g = e.google_predictions("libra_decoder_with_rl_optimized_prior")   # None where absent
+idx = split_indices(e)                # {"train": ..., "calibrate": ..., "test": ...}
+```
+
+Set `QECCAL_DATA_ROOT` if the extracted archive is not at `data/raw/google_105Q_surface_code_d3_d5_d7`.
