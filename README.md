@@ -2,11 +2,13 @@
 
 Calibrated confidence and certified abort thresholds for surface-code decoders, evaluated on Google's public Willow hardware data. Intelligent Systems-II course project.
 
+**Live app:** https://calibrated-qec-decoders.streamlit.app
+
 Planning documents live one folder up: `qec-decoder-calibration-spec.md` (the spec), `related-work.md`, `study-guide.md` and the Introduction / Literature Review / Methodology PDF.
 
 ## Status
 
-M0, M1 and M2 done; M4 (RQ1, RQ2) and M5 (drift study, RQ3, web app) done for the MWPM gap: `results/m4_summary.md`, `results/m5_summary.md`, `app/`. Next: deploy the app, then the belief-matching gap and the learned decoder (M3).
+M0, M1 and M2 done; M4 (RQ1, RQ2) and M5 (drift study, RQ3, web app) done for the MWPM gap: `results/m4_summary.md`, `results/m5_summary.md`, `app/`. The app is deployed at https://calibrated-qec-decoders.streamlit.app. Next: the belief-matching gap and the learned decoder (M3).
 
 ## Quick start
 

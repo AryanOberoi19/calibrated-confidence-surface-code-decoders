@@ -1,5 +1,7 @@
 # Web app
 
+Live: https://calibrated-qec-decoders.streamlit.app (Streamlit Community Cloud, redeploys on every push to `main`).
+
 `app/streamlit_app.py` has five views:
 
 - **Overview**: headline numbers, computed live from `results/`.
