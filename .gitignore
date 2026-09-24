@@ -1,0 +1,19 @@
+# raw data (5.7 GB archive) and anything extracted from it stay out of git
+data/raw/*
+!data/raw/.gitkeep
+data/extracted/
+results/cache/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# os / editors
+.DS_Store
+.ipynb_checkpoints/
+.vscode/
+.idea/

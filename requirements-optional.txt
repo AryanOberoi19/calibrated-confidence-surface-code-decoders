@@ -1,0 +1,4 @@
+# Tesseract decoder: only pre-release builds are published on PyPI, so it needs --pre.
+# Install:  pip install --pre -r requirements-optional.txt
+# After installing, pin the exact build you got (pip freeze | grep tesseract) in this file.
+tesseract-decoder
