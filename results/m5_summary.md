@@ -125,3 +125,56 @@ Seen from the source side (same rows): how many targets each source patch's cert
 | 5 | Z | q6_9 | 3 | 0 | 0.75 |
 | 5 | Z | q8_7 | 3 | 0 | 0.7 |
 
+## Transferring the keep fraction instead of the threshold (MWPM gap)
+
+Threshold: the source's gap threshold is used as is on the target. Keep fraction: the target keeps the same fraction of its own shots as was certified on the source (threshold re-set at the quantile of the target's unlabelled Train scores). Cells as above: significant / exceedance (certified / pairs).
+
+| Prior | Shift | Transfer | alpha=0.0003 | alpha=0.001 | alpha=0.003 | alpha=0.01 | alpha=0.03 | alpha=0.1 |
+|---|---|---|---|---|---|---|---|---|
+| rl | Other patch | threshold | - (0/672) | 2% / 5% (174/672) | 2% / 6% (320/672) | 11% / 13% (351/672) | 11% / 15% (429/672) | 14% / 18% (584/672) |
+| rl | Other patch | keep fraction | - (0/672) | 7% / 13% (174/672) | 15% / 17% (320/672) | 19% / 24% (351/672) | 20% / 24% (429/672) | 20% / 23% (584/672) |
+| rl | Other basis | threshold | - (0/112) | 0% / 3% (32/112) | 2% / 9% (55/112) | 6% / 11% (64/112) | 7% / 14% (81/112) | 11% / 14% (101/112) |
+| rl | Other basis | keep fraction | - (0/112) | 0% / 3% (32/112) | 4% / 13% (55/112) | 9% / 16% (64/112) | 16% / 22% (81/112) | 15% / 19% (101/112) |
+| rl | Other patches pooled | threshold | 0% / 4% (26/104) | 2% / 20% (44/104) | 2% / 6% (52/104) | 6% / 11% (62/104) | 10% / 18% (80/104) | 14% / 19% (101/104) |
+| rl | Other patches pooled | keep fraction | 8% / 12% (26/104) | 11% / 18% (44/104) | 10% / 13% (52/104) | 18% / 24% (62/104) | 20% / 24% (80/104) | 19% / 22% (101/104) |
+| rl | Simulation from the DEM | threshold | - (0/112) | 6% / 19% (32/112) | 11% / 30% (56/112) | 15% / 31% (68/112) | 23% / 40% (87/112) | 32% / 39% (105/112) |
+| rl | Simulation from the DEM | keep fraction | - (0/112) | 9% / 31% (32/112) | 14% / 27% (56/112) | 22% / 34% (68/112) | 26% / 38% (87/112) | 33% / 40% (105/112) |
+| si1000 | Other patch | threshold | - (0/672) | 0% / 0% (174/672) | 4% / 8% (320/672) | 8% / 10% (354/672) | 11% / 16% (389/672) | 14% / 18% (536/672) |
+| si1000 | Other patch | keep fraction | - (0/672) | 6% / 16% (174/672) | 14% / 18% (320/672) | 18% / 19% (354/672) | 16% / 20% (389/672) | 19% / 22% (536/672) |
+| si1000 | Other basis | threshold | - (0/112) | 0% / 3% (32/112) | 5% / 11% (55/112) | 11% / 15% (65/112) | 11% / 18% (76/112) | 13% / 18% (95/112) |
+| si1000 | Other basis | keep fraction | - (0/112) | 0% / 6% (32/112) | 5% / 13% (55/112) | 12% / 15% (65/112) | 11% / 18% (76/112) | 16% / 20% (95/112) |
+| si1000 | Other patches pooled | threshold | 0% / 4% (26/104) | 2% / 10% (52/104) | 2% / 6% (52/104) | 8% / 10% (61/104) | 6% / 7% (68/104) | 12% / 17% (95/104) |
+| si1000 | Other patches pooled | keep fraction | 4% / 8% (26/104) | 10% / 17% (52/104) | 12% / 17% (52/104) | 15% / 18% (61/104) | 12% / 19% (68/104) | 17% / 21% (95/104) |
+| si1000 | Simulation from the DEM | threshold | - (0/112) | 55% / 68% (76/112) | 73% / 87% (94/112) | 67% / 76% (112/112) | 73% / 74% (112/112) | 53% / 53% (112/112) |
+| si1000 | Simulation from the DEM | keep fraction | - (0/112) | 86% / 96% (76/112) | 84% / 89% (94/112) | 77% / 77% (112/112) | 73% / 74% (112/112) | 53% / 53% (112/112) |
+
+## Belief-matching gap under shift (RL prior, threshold transfer)
+
+Same study with the belief-matching gap as the score, hardware axes only, on the 112 target experiments it covers; the MWPM rows are restricted to the same targets. Cells: significant / exceedance (certified / pairs).
+
+| Shift | Score | alpha=0.0003 | alpha=0.001 | alpha=0.003 | alpha=0.01 | alpha=0.03 | alpha=0.1 |
+|---|---|---|---|---|---|---|---|
+| Same experiment (reference) | MWPM gap | - (0/112) | 0% / 0% (32/112) | 0% / 0% (55/112) | 0% / 3% (64/112) | 0% / 0% (81/112) | 0% / 1% (101/112) |
+| Same experiment (reference) | Belief-matching gap | - (0/112) | 0% / 3% (34/112) | 0% / 2% (56/112) | 0% / 3% (69/112) | 0% / 1% (92/112) | 0% / 0% (112/112) |
+| Other patch | MWPM gap | - (0/672) | 2% / 5% (174/672) | 2% / 6% (320/672) | 11% / 13% (351/672) | 11% / 15% (429/672) | 14% / 18% (584/672) |
+| Other patch | Belief-matching gap | - (0/672) | 0% / 2% (180/672) | 1% / 7% (320/672) | 9% / 15% (378/672) | 13% / 19% (512/672) | 15% / 20% (672/672) |
+| Other basis | MWPM gap | - (0/112) | 0% / 3% (32/112) | 2% / 9% (55/112) | 6% / 11% (64/112) | 7% / 14% (81/112) | 11% / 14% (101/112) |
+| Other basis | Belief-matching gap | - (0/112) | 3% / 6% (34/112) | 4% / 18% (56/112) | 10% / 14% (69/112) | 7% / 16% (92/112) | 12% / 17% (112/112) |
+| Other patches pooled | MWPM gap | 0% / 4% (26/104) | 2% / 20% (44/104) | 2% / 6% (52/104) | 6% / 11% (62/104) | 10% / 18% (80/104) | 14% / 19% (101/104) |
+| Other patches pooled | Belief-matching gap | 0% / 4% (26/104) | 0% / 16% (49/104) | 2% / 9% (53/104) | 6% / 13% (71/104) | 10% / 16% (86/104) | 15% / 18% (104/104) |
+
+## Learned decoder (d = 3) under shift (RL prior, threshold transfer)
+
+Same study with the learned decoder (d = 3) as the score, hardware axes only, on the 72 target experiments it covers; the MWPM rows are restricted to the same targets. Cells: significant / exceedance (certified / pairs).
+
+| Shift | Score | alpha=0.0003 | alpha=0.001 | alpha=0.003 | alpha=0.01 | alpha=0.03 | alpha=0.1 |
+|---|---|---|---|---|---|---|---|
+| Same experiment (reference) | MWPM gap | - (0/72) | 0% / 0% (18/72) | 0% / 0% (34/72) | 0% / 6% (36/72) | 0% / 0% (42/72) | 0% / 0% (61/72) |
+| Same experiment (reference) | Learned decoder (d = 3) | - (0/72) | 0% / 0% (18/72) | 0% / 0% (36/72) | 0% / 2% (42/72) | 0% / 0% (58/72) | 0% / 1% (72/72) |
+| Other patch | MWPM gap | - (0/576) | 2% / 5% (144/576) | 3% / 7% (272/576) | 13% / 16% (288/576) | 13% / 15% (336/576) | 14% / 18% (488/576) |
+| Other patch | Learned decoder (d = 3) | - (0/576) | 0% / 1% (144/576) | 1% / 4% (288/576) | 6% / 12% (336/576) | 7% / 15% (464/576) | 13% / 16% (576/576) |
+| Other basis | MWPM gap | - (0/72) | 0% / 0% (18/72) | 3% / 9% (34/72) | 11% / 14% (36/72) | 12% / 17% (42/72) | 11% / 15% (61/72) |
+| Other basis | Learned decoder (d = 3) | - (0/72) | 0% / 11% (18/72) | 0% / 0% (36/72) | 7% / 10% (42/72) | 0% / 16% (58/72) | 6% / 11% (72/72) |
+| Other patches pooled | MWPM gap | 0% / 6% (18/72) | 4% / 25% (28/72) | 3% / 8% (36/72) | 11% / 11% (36/72) | 15% / 19% (48/72) | 14% / 22% (69/72) |
+| Other patches pooled | Learned decoder (d = 3) | 0% / 11% (18/72) | 0% / 6% (36/72) | 0% / 8% (36/72) | 4% / 15% (54/72) | 7% / 21% (71/72) | 15% / 18% (72/72) |
+

@@ -106,3 +106,53 @@ Certified experiments and mean fraction of Test shots kept at the certified thre
 | 0.03 | 42/252 | 0.73 | 32/112 | 0.59 | 10/28 | 0.62 |
 | 0.1 | 61/252 | 0.69 | 45/112 | 0.61 | 17/28 | 0.56 |
 
+## Belief-matching gap against the MWPM gap (RL prior, Test split)
+
+112 experiments (d in [3, 5, 7], r in [1, 10, 30, 50], all patches and bases). Logical error: pooled over patches and bases. ECE x1000 and NLL (nats per shot): means over experiments. Each score is calibrated on its own Train split.
+
+| d | r | Error, MWPM | Error, BM | ECE raw, MWPM | ECE raw, BM | ECE Platt, MWPM | ECE Platt, BM | NLL Platt, MWPM | NLL Platt, BM |
+|---|---|---|---|---|---|---|---|---|---|
+| 3 | 1 | 0.629% | 0.631% | 3.03 | 5.02 | 0.86 | 1.11 | 0.0210 | 0.0212 |
+| 3 | 10 | 8.140% | 6.624% | 26.98 | 38.67 | 9.35 | 10.41 | 0.2153 | 0.1736 |
+| 3 | 30 | 23.422% | 19.640% | 91.43 | 107.70 | 22.13 | 17.69 | 0.4852 | 0.4157 |
+| 3 | 50 | 30.293% | 25.910% | 119.28 | 138.57 | 23.76 | 17.21 | 0.5714 | 0.5065 |
+| 5 | 1 | 0.213% | 0.215% | 0.83 | 1.77 | 0.42 | 0.31 | 0.0067 | 0.0069 |
+| 5 | 10 | 5.062% | 3.377% | 14.83 | 21.86 | 3.50 | 4.68 | 0.1337 | 0.0948 |
+| 5 | 30 | 17.280% | 11.737% | 60.75 | 75.06 | 7.20 | 10.38 | 0.3777 | 0.2817 |
+| 5 | 50 | 22.255% | 15.121% | 77.95 | 94.77 | 10.57 | 12.41 | 0.4578 | 0.3473 |
+| 7 | 1 | 0.057% | 0.070% | 0.20 | 0.57 | 0.05 | 0.20 | 0.0019 | 0.0022 |
+| 7 | 10 | 2.893% | 1.703% | 8.60 | 12.19 | 3.33 | 2.62 | 0.0791 | 0.0492 |
+| 7 | 30 | 11.337% | 6.730% | 38.95 | 48.33 | 6.20 | 9.04 | 0.2672 | 0.1754 |
+| 7 | 50 | 16.130% | 9.173% | 59.48 | 63.87 | 9.37 | 9.13 | 0.3553 | 0.2319 |
+
+Learn-then-Test on the same experiments: certified experiments, mean fraction of Test shots kept (uncertified count as 0), and significant exceedance among certified.
+
+| alpha | Certified, MWPM | Certified, BM | Kept, MWPM | Kept, BM | Significant, MWPM | Significant, BM |
+|---|---|---|---|---|---|---|
+| 0.001 | 32/112 | 34/112 | 0.25 | 0.26 | 0.0% | 0.0% |
+| 0.003 | 55/112 | 56/112 | 0.33 | 0.35 | 0.0% | 0.0% |
+| 0.01 | 64/112 | 69/112 | 0.39 | 0.45 | 0.0% | 0.0% |
+| 0.03 | 81/112 | 92/112 | 0.49 | 0.59 | 0.0% | 0.0% |
+| 0.1 | 101/112 | 112/112 | 0.67 | 0.81 | 0.0% | 0.0% |
+
+## Learned decoder against the MWPM gap (RL prior, Test split)
+
+72 experiments (d in [3], r in [1, 10, 30, 50], all patches and bases). Logical error: pooled over patches and bases. ECE x1000 and NLL (nats per shot): means over experiments. Each score is calibrated on its own Train split. The learned decoder's calibrators and thresholds use the 5,000 Train shots it was not fine-tuned on; the MWPM gap uses all 20,000.
+
+| d | r | Error, MWPM | Error, NN | ECE raw, MWPM | ECE raw, NN | ECE Platt, MWPM | ECE Platt, NN | NLL Platt, MWPM | NLL Platt, NN |
+|---|---|---|---|---|---|---|---|---|---|
+| 3 | 1 | 0.629% | 0.614% | 3.03 | 0.86 | 0.86 | 1.08 | 0.0210 | 0.0200 |
+| 3 | 10 | 8.140% | 6.485% | 26.98 | 3.84 | 9.35 | 5.68 | 0.2153 | 0.1635 |
+| 3 | 30 | 23.422% | 19.076% | 91.43 | 8.56 | 22.13 | 7.88 | 0.4852 | 0.3979 |
+| 3 | 50 | 30.293% | 25.643% | 119.28 | 9.29 | 23.76 | 9.98 | 0.5714 | 0.4950 |
+
+Learn-then-Test on the same experiments: certified experiments, mean fraction of Test shots kept (uncertified count as 0), and significant exceedance among certified.
+
+| alpha | Certified, MWPM | Certified, NN | Kept, MWPM | Kept, NN | Significant, MWPM | Significant, NN |
+|---|---|---|---|---|---|---|
+| 0.001 | 18/72 | 18/72 | 0.22 | 0.22 | 0.0% | 0.0% |
+| 0.003 | 34/72 | 36/72 | 0.30 | 0.32 | 0.0% | 0.0% |
+| 0.01 | 36/72 | 42/72 | 0.34 | 0.41 | 0.0% | 0.0% |
+| 0.03 | 42/72 | 58/72 | 0.42 | 0.53 | 0.0% | 0.0% |
+| 0.1 | 61/72 | 72/72 | 0.59 | 0.76 | 0.0% | 0.0% |
+
