@@ -75,6 +75,12 @@ def certify(s_train, s_cal, wrong_cal, alpha, delta, keep_grid=KEEP_GRID):
     return None if i is None else (float(lams[i]), float(keep_grid[i]))
 
 
+def threshold_for_keep(s_unlabelled, keep) -> float:
+    """Keep-fraction transfer: the threshold that keeps a fraction `keep` of a target's own scores. Needs only
+    unlabelled target shots (detections, no observable), so it can be recomputed on a new device or day."""
+    return -np.inf if keep >= 1 else float(np.quantile(np.asarray(s_unlabelled, np.float64), 1 - keep))
+
+
 def evaluate(lam, s_test, wrong_test, alpha) -> dict:
     """Kept count, errors, rate and exceedance flags of threshold lam on a (possibly different) target's Test shots."""
     kept = np.asarray(s_test) >= lam

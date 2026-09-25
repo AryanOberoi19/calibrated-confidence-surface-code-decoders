@@ -14,6 +14,6 @@ def apply():
         "xtick.color": MUTED, "ytick.color": MUTED, "xtick.labelcolor": INK2, "ytick.labelcolor": INK2,
         "lines.linewidth": 1.6, "lines.markersize": 5, "lines.solid_capstyle": "round",
         "legend.frameon": False, "legend.fontsize": 8, "legend.labelcolor": INK2,
-        "figure.dpi": 150, "savefig.bbox": "tight", "savefig.pad_inches": 0.03,
+        "figure.dpi": 150, "savefig.dpi": 300, "savefig.bbox": "tight", "savefig.pad_inches": 0.03,
         "pdf.fonttype": 42,
     })

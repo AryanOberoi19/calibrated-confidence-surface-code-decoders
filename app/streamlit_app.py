@@ -32,6 +32,9 @@ PATHWAY_NAME = {"correlated_matching_decoder_with_si1000_prior": "Correlated mat
                 "harmony_decoder_with_rl_optimized_prior": "Harmony, RL prior",
                 "libra_decoder_with_rl_optimized_prior": "Libra, RL prior"}
 
+METHOD_NAME = {"mwpm_gap": "MWPM gap", "bm_gap": "Belief-matching gap", "nn": "Learned decoder (d = 3)",
+               "exact": "Exact posterior"}
+
 st.set_page_config(page_title="Calibrated confidence for surface-code decoders", layout="wide")
 
 
@@ -65,7 +68,10 @@ def scores(key):
 
 @st.cache_data
 def csv(name):
-    return pd.read_csv(RES / name)
+    df = pd.read_csv(RES / name)
+    if name == "m5_drift.csv":            # older result files predate these columns
+        df = df.assign(**{c: v for c, v in (("method", "mwpm_gap"), ("transfer", "threshold")) if c not in df})
+    return df
 
 
 @st.cache_resource
@@ -101,7 +107,8 @@ def overview():
     g = csv("m4_guarantees.csv")
     sel = g[(g.method == "mwpm_gap") & (g.prior == "rl") & (g.alpha == 0.01) & g.keep.notna()]
     d = csv("m5_drift.csv")
-    dsel = d[(d.prior == "rl") & (d.alpha == 0.01) & (d.certified == 1)]
+    dsel = d[(d.method == "mwpm_gap") & (d.transfer == "threshold") & (d.prior == "rl") & (d.alpha == 0.01)
+             & (d.certified == 1)]
     c1, c2, c3 = st.columns(3)
     ltt = sel[sel.rule == "ltt"]
     raw = sel[sel.rule == "naive_raw"]
@@ -198,8 +205,9 @@ def calibration():
     d = c1.selectbox("Distance", [3, 5, 7])
     r = c2.selectbox("Rounds", [1, 10, 30, 50], index=1)
     prior = c3.selectbox("Prior DEM", ["rl", "si1000"], format_func={"rl": "RL-optimized (fitted)", "si1000": "SI1000"}.get)
-    methods = sorted(rel[(rel.distance == d) & (rel.rounds == r)].method.unique(), key=lambda m: m != "mwpm_gap")
-    method = c4.selectbox("Soft output", methods, format_func={"mwpm_gap": "MWPM gap", "exact": "Exact posterior"}.get)
+    methods = sorted(rel[(rel.distance == d) & (rel.rounds == r) & (rel.prior == prior)].method.unique(),
+                     key=lambda m: m != "mwpm_gap")
+    method = c4.selectbox("Soft output", methods, format_func=METHOD_NAME.get)
     sel = rel[(rel.distance == d) & (rel.rounds == r) & (rel.prior == prior) & (rel.method == method)]
     fig = go.Figure()
     lo = max(1e-6, sel.mean_q[sel.mean_q > 0].min() / 2)
@@ -291,8 +299,16 @@ def postselection():
 
 def drift():
     d = csv("m5_drift.csv")
-    prior = st.radio("Prior DEM", ["rl", "si1000"], horizontal=True,
+    c1, c2, c3 = st.columns(3)
+    prior = c1.radio("Prior DEM", ["rl", "si1000"], horizontal=True,
                      format_func={"rl": "RL-optimized (fitted)", "si1000": "SI1000"}.get)
+    methods = [m for m in METHOD_NAME if m != "exact" and ((d.method == m) & (d.prior == prior)).any()]
+    method = c2.radio("Score", methods, horizontal=True, format_func=METHOD_NAME.get)
+    transfer = c3.radio("Move to the target", ["threshold", "keep_fraction"], horizontal=True,
+                        format_func={"threshold": "same threshold", "keep_fraction": "same keep fraction"}.get,
+                        help="Same keep fraction: the target keeps the fraction of its own shots that was certified "
+                             "on the source; the threshold is re-set from the target's unlabelled shots.")
+    d = d[(d.method == method) & (d.transfer == transfer)]
     names = {"same": "Same experiment (reference)", "patch": "Other patch", "basis": "Other basis",
              "pooled": "Other patches pooled", "sim": "Simulated from the DEM"}
     cols = {"same": C[0], "patch": C[1], "basis": C[2], "pooled": C[3], "sim": "#52514e"}
@@ -301,6 +317,8 @@ def drift():
     fig = go.Figure()
     for axis, name in names.items():
         a = agg[agg.axis == axis]
+        if a.empty:
+            continue
         fig.add_trace(go.Scatter(x=a.alpha, y=100 * a.sig, mode="lines+markers", name=name,
                                  line=dict(color=cols[axis], width=2, dash="dot" if axis == "sim" else None),
                                  customdata=np.c_[100 * a.exc, a.n],
@@ -336,7 +354,7 @@ def drift():
     fig.update_yaxes(title="Source patch (certified on)", autorange="reversed")
     st.plotly_chart(fig_layout(fig, 480), width="stretch")
     st.caption("Blue: the target's Test error is below α; orange: above (the promise failed on that target). "
-               "Empty cells: not certifiable on the source. MWPM gap; δ = 0.05.")
+               f"Empty cells: not certifiable on the source. {METHOD_NAME[method]}; δ = 0.05.")
 
 
 st.title("Calibrated confidence for surface-code decoders")

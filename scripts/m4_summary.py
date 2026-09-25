@@ -1,7 +1,8 @@
 """Summarise M4: calibration on Test (RQ1) and certified thresholds against uncertified rules (RQ2).
 
     python scripts/m4_summary.py
-Reads results/m4_calibration.csv and results/m4_guarantees.csv; writes results/m4_summary.md and two figures.
+Reads results/m4_calibration.csv and results/m4_guarantees.csv; writes results/m4_summary.md and two figures
+(three once the belief-matching or learned-decoder caches exist).
 """
 import collections
 import csv
@@ -14,10 +15,10 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt  # noqa: E402
 
 from qeccal import plotting  # noqa: E402
-from qeccal.calibration import CALIBRATORS, reliability  # noqa: E402
+from qeccal.calibration import CALIBRATORS, error_vs_discard, reliability  # noqa: E402
 from qeccal.data import get_experiment, list_experiments, split_indices  # noqa: E402
 from qeccal.calibration import score_from_q  # noqa: E402
-from qeccal.soft.cache import load  # noqa: E402
+from qeccal.soft.cache import cache_path, load  # noqa: E402
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 RES = REPO / "results"
@@ -147,6 +148,9 @@ def main():
             cells += [f"{len(sel)}/{len(rows)}", f"{np.mean([int(r['test_n']) / size[r['key']] for r in sel]):.2f}" if sel else "-"]
         L.append(f"| {a:g} | " + " | ".join(cells) + " |")
     L.append("")
+    others = [m for m in ("bm_gap", "nn") if any(r["method"] == m for r in cal)]
+    for m in others:
+        L += other_section(cal, g, m, alphas, size)
     (RES / "m4_summary.md").write_text("\n".join(L) + "\n")
     print("\n".join(L))
 
@@ -211,8 +215,92 @@ def main():
     ax.set_title("d = 5, r = 10, Test split")
     ax.legend(loc="upper left", fontsize=7)
     fig.savefig(RES / "m4_reliability_test.png")
-    print("wrote results/m4_summary.md and two figures")
+    if others:
+        scores_figure()
+    print("wrote results/m4_summary.md and figures")
 
+
+NAME = {"mwpm_gap": "MWPM gap", "bm_gap": "Belief-matching gap", "nn": "Learned decoder"}
+SHORT = {"mwpm_gap": "MWPM", "bm_gap": "BM", "nn": "NN"}
+
+
+def other_section(cal, g, method, alphas, size):
+    """One extra score against the MWPM gap, on the experiments the extra score was run on (RL prior)."""
+    keys = {r["key"] for r in cal if r["method"] == method}
+    rounds = sorted({r["rounds"] for r in cal if r["key"] in keys})
+    dists = sorted({r["distance"] for r in cal if r["key"] in keys})
+    ms = ("mwpm_gap", method)
+    a, b = SHORT["mwpm_gap"], SHORT[method]
+    note = {"bm_gap": "", "nn": " The learned decoder's calibrators and thresholds use the 5,000 Train shots it "
+            "was not fine-tuned on; the MWPM gap uses all 20,000."}[method]
+    L = [f"## {NAME[method]} against the MWPM gap (RL prior, Test split)", "",
+         f"{len(keys)} experiments (d in {dists}, r in {rounds}, all patches and bases). Logical error: pooled over "
+         "patches and bases. ECE x1000 and NLL (nats per shot): means over experiments. Each score is calibrated "
+         "on its own Train split." + note, "",
+         f"| d | r | Error, {a} | Error, {b} | ECE raw, {a} | ECE raw, {b} | ECE Platt, {a} | ECE Platt, {b} "
+         f"| NLL Platt, {a} | NLL Platt, {b} |", "|---|---|---|---|---|---|---|---|---|---|"]
+    pick = lambda m, c, d, rr: [r for r in cal if r["method"] == m and r["prior"] == "rl" and r["calibrator"] == c  # noqa: E731
+                                and r["distance"] == d and r["rounds"] == rr and r["key"] in keys]
+    for d in dists:
+        for rr in rounds:
+            raw = {m: pick(m, "raw", d, rr) for m in ms}
+            if not raw[method]:
+                continue
+            platt = {m: pick(m, "platt", d, rr) for m in ms}
+            err = [sum(r["test_errors"] for r in raw[m]) / sum(r["test_n"] for r in raw[m]) for m in ms]
+            L.append(f"| {d} | {rr} | {100 * err[0]:.3f}% | {100 * err[1]:.3f}% | "
+                     + " | ".join(f"{1000 * np.mean([r['ece'] for r in raw[m]]):.2f}" for m in ms) + " | "
+                     + " | ".join(f"{1000 * np.mean([r['ece'] for r in platt[m]]):.2f}" for m in ms) + " | "
+                     + " | ".join(f"{np.mean([r['nll'] for r in platt[m]]):.4f}" for m in ms) + " |")
+    L += ["", "Learn-then-Test on the same experiments: certified experiments, mean fraction of Test shots kept "
+          "(uncertified count as 0), and significant exceedance among certified.", "",
+          f"| alpha | Certified, {a} | Certified, {b} | Kept, {a} | Kept, {b} | Significant, {a} | Significant, {b} |",
+          "|---|---|---|---|---|---|---|"]
+    for al in alphas:
+        rows = {m: [r for r in g if r["method"] == m and r["prior"] == "rl" and r["alpha"] == al and r["rule"] == "ltt"
+                    and r["key"] in keys] for m in ms}
+        sel = {m: [r for r in v if r["keep"] != ""] for m, v in rows.items()}
+        kept = {m: np.mean([int(r["test_n"]) / size[r["key"]] if r["keep"] != "" else 0.0 for r in v]) for m, v in rows.items()}
+        sig = {m: f"{100 * np.mean([int(r['sig_exceed']) for r in v]):.1f}%" if v else "-" for m, v in sel.items()}
+        L.append(f"| {al:g} | {len(sel[ms[0]])}/{len(rows[ms[0]])} | {len(sel[ms[1]])}/{len(rows[ms[1]])} | "
+                 f"{kept[ms[0]]:.2f} | {kept[ms[1]]:.2f} | {sig[ms[0]]} | {sig[ms[1]]} |")
+    L.append("")
+    return L
+
+
+def scores_figure():
+    """Error among kept Test shots against fraction kept, r = 10, pooled over patches and bases, per distance."""
+    fracs = np.linspace(0, 0.95, 39)
+    fig, axes = plt.subplots(1, 3, figsize=(7.2, 2.5))
+    for ax, d in zip(axes, (3, 5, 7)):
+        exps = list_experiments(distance=d, rounds=10)
+        for i, m in enumerate(("mwpm_gap", "bm_gap", "nn")):
+            have = [e for e in exps if cache_path(m, "rl", e.key).exists()]
+            if not have:
+                continue
+            s_all, w_all = [], []
+            for e in have:
+                o = load(m, "rl", e.key)
+                te = split_indices(e)["test"]
+                s = o["gap"].astype(np.float64) if "gap" in o else score_from_q(o["q"])
+                s_all.append(s[te])
+                w_all.append((o["pred"] != e.observable_flips())[te])
+            s, w = np.concatenate(s_all), np.concatenate(w_all)
+            kept, err = error_vs_discard(-s, w, fracs, np.random.default_rng(0))
+            ax.plot(kept / s.size, np.where(err > 0, err / kept, np.nan), color=plotting.C[i], label=NAME[m])
+        ax.set_yscale("log")
+        ax.set_xlim(1.02, 0.0)
+        ax.set_xlabel("Fraction of shots kept")
+        ax.set_title(f"d = {d}, r = 10", fontsize=8)
+    axes[0].set_ylabel("Logical error among kept")
+    handles = {}
+    for ax in axes:
+        for h, lab in zip(*ax.get_legend_handles_labels()):
+            handles.setdefault(lab, h)
+    fig.legend(handles.values(), handles.keys(), loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.1), fontsize=7)
+    fig.text(0.5, -0.1, "RL prior, Test split, pooled over patches and bases; least confident shots discarded first. "
+             "The learned decoder was trained at d = 3 only.", ha="center", fontsize=7, color=plotting.INK2)
+    fig.savefig(RES / "m4_scores_vs_mwpm.png")
 
 if __name__ == "__main__":
     main()

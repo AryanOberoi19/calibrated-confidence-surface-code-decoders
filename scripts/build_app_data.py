@@ -48,13 +48,15 @@ def main():
         idx = split_indices(e)
         obs = e.observable_flips()
         for prior in ("rl", "si1000"):
-            for method in ("mwpm_gap", "exact"):
+            for method in ("mwpm_gap", "exact", "bm_gap", "nn"):
                 if not cache_path(method, prior, e.key).exists():
                     continue
                 o = load(method, prior, e.key)
                 s = o["gap"].astype(np.float64) if "gap" in o else score_from_q(o["q"])
                 w = o["pred"] != obs
                 tr, ca, te = idx["train"], idx["calibrate"], idx["test"]
+                if "fit_mask" in o:
+                    tr = tr[~o["fit_mask"][tr]]
                 for name, C in CALIBRATORS.items():
                     q = C().fit(s[tr], w[tr]).predict(s[te])
                     k = (e.distance, e.rounds, prior, method, name)

@@ -6,9 +6,9 @@ Live: https://calibrated-qec-decoders.streamlit.app (Streamlit Community Cloud, 
 
 - **Overview**: headline numbers, computed live from `results/`.
 - **Shot explorer**: 300 Test shots from each of 8 experiments. Each shot is decoded live: the logical gap, raw and Platt-calibrated P(wrong), Google's five predictions, and a 3D space-time plot of the detection events and the MWPM matching.
-- **Calibration**: Test reliability diagrams and ECE, Brier and NLL per calibrator, by distance, round count and prior. At r=1 it also covers the exact posterior.
+- **Calibration**: Test reliability diagrams and ECE, Brier and NLL per calibrator, by distance, round count, prior and soft output: the MWPM gap everywhere, the exact posterior at r=1, the belief-matching gap (RL prior, r in 1, 10, 30, 50) and the learned decoder (d=3, same round counts).
 - **Postselection**: pick an experiment, α and δ. The view runs Learn-then-Test live on the Calibrate split and compares it on the Test split with the plug-in, raw-q and Platt-q rules.
-- **Drift**: how often certified thresholds miss α after a shift, and a patch-to-patch matrix.
+- **Drift**: how often certified thresholds miss α after a shift, and a patch-to-patch matrix. Toggles: prior, score (MWPM gap, belief-matching gap, learned decoder) and how the threshold is moved to the target (the same gap threshold, or the same keep fraction).
 
 The app never needs the raw archive. It reads `app/data/` (6.7 MB, committed) and `results/*.csv`.
 
@@ -21,7 +21,7 @@ streamlit run app/streamlit_app.py
 
 ## Rebuild the app data
 
-This needs the extracted archive and the M2 cache (`results/cache/soft/`):
+This needs the extracted archive and the soft-output caches (`results/cache/soft/`, written by `m2_soft_outputs.py`, `m2_belief_gap.py` and `m3_learned.py`):
 
 ```bash
 python scripts/build_app_data.py

@@ -24,6 +24,8 @@ python scripts/m1_summary.py                   # per-cycle error, Lambda, figure
 python scripts/alpha_floor.py                  # smallest certifiable alpha -> results/
 python scripts/m2_soft_outputs.py              # MWPM gap (all) and exact posterior (r=1), per-shot cache (~10 min)
 python scripts/m2_summary.py                   # error vs discard and calibration on the Train split -> results/
+python scripts/m2_belief_gap.py                # belief-matching gap, RL prior, r in 1/10/30/50 (~1.5 h on 10 cores)
+python scripts/m3_learned.py all               # learned decoder at d=3: pretrain, fine-tune, infer (MPS, ~40 min)
 python scripts/m4_calibrate_certify.py         # calibrators (Train), Learn-then-Test (Calibrate), evaluation (Test)
 python scripts/m4_summary.py                   # RQ1 / RQ2 tables and figures -> results/
 python scripts/m5_drift.py                     # RQ3: certify on a source, evaluate on a shifted target (~2 min)

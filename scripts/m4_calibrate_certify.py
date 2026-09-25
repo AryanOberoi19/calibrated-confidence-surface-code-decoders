@@ -3,7 +3,9 @@
 Split discipline (spec 8.4): calibrators and the threshold grid are fitted on Train; Calibrate is used only
 to select thresholds; Test only to evaluate. r = 13 has no Calibrate or Test shots and is skipped.
 
-Score s per shot: the MWPM gap, or log((1 - q) / q) for the exact posterior (r = 1). Threshold rules, each
+Score s per shot: the MWPM gap, the belief-matching gap (RL prior, r in 1, 10, 30, 50; scripts/m2_belief_gap.py),
+or log((1 - q) / q) for the exact posterior (r = 1) and the learned decoder (d = 3; scripts/m3_learned.py; its
+Train split excludes the shots it was fine-tuned on). Combinations without a cache are skipped. Threshold rules, each
 choosing a keep fraction from the same Train-defined grid (qeccal.guarantees.KEEP_GRID):
   ltt          Learn-then-Test, fixed sequence, delta = 0.05: certified
   plugin       loosest threshold whose Calibrate error among kept is <= alpha (no margin)
@@ -31,7 +33,7 @@ REPO = pathlib.Path(__file__).resolve().parents[1]
 RES = REPO / "results"
 ALPHAS = (1e-3, 3e-3, 1e-2, 3e-2, 1e-1)
 DELTA = 0.05
-COMBOS = [("mwpm_gap", "si1000"), ("mwpm_gap", "rl"), ("exact", "si1000"), ("exact", "rl")]
+COMBOS = [("mwpm_gap", "si1000"), ("mwpm_gap", "rl"), ("exact", "si1000"), ("exact", "rl"), ("bm_gap", "rl"), ("nn", "rl")]
 CAL_FIELDS = ["key", "distance", "patch", "basis", "rounds", "method", "prior", "calibrator", "test_n",
               "test_errors", "mean_q", "ece", "brier", "nll", "params"]
 G_FIELDS = ["key", "distance", "patch", "basis", "rounds", "method", "prior", "alpha", "rule", "keep",
@@ -51,6 +53,8 @@ def run(key):
         s = o["gap"].astype(np.float64) if "gap" in o else score_from_q(o["q"])
         wrong = o["pred"] != obs
         tr, ca, te = idx["train"], idx["calibrate"], idx["test"]
+        if "fit_mask" in o:                                # learned decoder: drop the Train shots it was trained on
+            tr = tr[~o["fit_mask"][tr]]
         fitted = {name: C().fit(s[tr], wrong[tr]) for name, C in CALIBRATORS.items()}
         for name, c in fitted.items():
             q = c.predict(s[te])

@@ -1,8 +1,9 @@
 """M5 / RQ3: does a certified abort threshold (and a fitted calibrator) survive a shift from source to target?
 
-Score: MWPM gap, per prior. For every (source, target) pair: fit calibrators on the source Train split, select
-the threshold with Learn-then-Test on the source Calibrate split (delta = 0.05), then measure it on the target's
-Test split. Shift axes (spec 8.7):
+Scores: the MWPM gap under both priors; under the RL prior also the belief-matching gap and, at d = 3, the
+learned decoder's |logit| (on the experiments their caches cover; scripts/m2_belief_gap.py, scripts/m3_learned.py). For every (source, target) pair: fit calibrators on the source Train split,
+select the threshold with Learn-then-Test on the source Calibrate split (delta = 0.05), then measure it on the
+target's Test split. Shift axes (spec 8.7):
 
   same      source = target (the in-distribution reference, as in M4)
   patch     another patch, same distance, basis and round count (all ordered pairs)
@@ -10,7 +11,13 @@ Test split. Shift axes (spec 8.7):
   pooled    leave-one-patch-out: all other patches of that distance, basis and round count pooled as the source
   sim       shots simulated from the experiment's own DEM (the prior), decoded with that DEM
 
-Round counts 1, 10, 30, 50 (beyond 50 almost nothing is certifiable, see M4).
+Round counts 1, 10, 30, 50 (beyond 50 almost nothing is certifiable, see M4). The sim axis is run for the MWPM
+gap only (belief-matching on simulated shots would cost another ~10 core-hours).
+
+Two ways to move a certified threshold to the target (column `transfer`):
+  threshold      use the source's gap threshold lambda as is
+  keep_fraction  keep the same fraction of the target's shots as was certified on the source: the threshold is
+                 re-set at the (1 - keep) quantile of the target's own Train scores, which needs no labels
 
     python scripts/m5_drift.py
 Writes results/m5_drift.csv and results/m5_calibration.csv. Simulated shots are cached in results/cache/sim/.
@@ -24,12 +31,12 @@ import time
 
 import numpy as np
 
-from qeccal.calibration import Isotonic, Platt, ece, nll
+from qeccal.calibration import Isotonic, Platt, ece, nll, score_from_q
 from qeccal.data import get_experiment, list_experiments, split_indices
 from qeccal.data.splits import SEED, _key_seed
-from qeccal.guarantees import certify, evaluate
+from qeccal.guarantees import certify, evaluate, threshold_for_keep
 from qeccal.soft import sample_gap
-from qeccal.soft.cache import load
+from qeccal.soft.cache import cache_path, load
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
 RES = REPO / "results"
@@ -38,10 +45,13 @@ ROUNDS = (1, 10, 30, 50)
 ALPHAS = (3e-4, 1e-3, 3e-3, 1e-2, 3e-2, 1e-1)
 DELTA = 0.05
 PRIORS = ("si1000", "rl")
+COMBOS = (("mwpm_gap", "si1000"), ("mwpm_gap", "rl"), ("bm_gap", "rl"), ("nn", "rl"))
+TRANSFERS = ("threshold", "keep_fraction")
 N_TRAIN, N_CAL = 20_000, 15_000
-G_FIELDS = ["axis", "source", "target", "distance", "basis", "rounds", "patch", "prior", "alpha", "certified", "keep",
-            "src_cal_n", "test_n", "test_errors", "test_rate", "exceed", "sig_exceed"]
-C_FIELDS = ["axis", "source", "target", "distance", "basis", "rounds", "patch", "prior", "calibrator", "ece", "nll"]
+G_FIELDS = ["axis", "source", "target", "distance", "basis", "rounds", "patch", "method", "prior", "alpha", "transfer",
+            "certified", "keep", "src_cal_n", "test_n", "test_errors", "test_rate", "exceed", "sig_exceed"]
+C_FIELDS = ["axis", "source", "target", "distance", "basis", "rounds", "patch", "method", "prior", "calibrator", "ece",
+            "nll"]
 
 
 def sim_path(prior, key):
@@ -65,11 +75,13 @@ def load_sim(prior, key):
     return {"train": (s[:N_TRAIN], w[:N_TRAIN]), "calibrate": (s[N_TRAIN:], w[N_TRAIN:])}
 
 
-def load_hw(e, prior):
+def load_hw(e, method, prior):
     idx = split_indices(e)
-    o = load("mwpm_gap", prior, e.key)
-    s = o["gap"].astype(np.float64)
+    o = load(method, prior, e.key)
+    s = o["gap"].astype(np.float64) if "gap" in o else score_from_q(o["q"])
     w = o["pred"] != e.observable_flips()
+    if "fit_mask" in o:                                    # learned decoder: drop the Train shots it was trained on
+        idx["train"] = idx["train"][~o["fit_mask"][idx["train"]]]
     return {r: (s[idx[r]], w[idx[r]]) for r in ("train", "calibrate", "test")}
 
 
@@ -92,18 +104,22 @@ def main():
             if i % 40 == 0:
                 print(f"  simulated {i}/{len(todo)} ({time.time() - t0:.0f}s)", flush=True)
 
-    by_key = {e.key: e for e in exps}
-    groups = collections.defaultdict(list)          # (d, basis, r) -> experiments over patches
-    for e in exps:
-        groups[(e.distance, e.basis, e.rounds)].append(e)
-
     g_rows, c_rows = [], []
-    for prior in PRIORS:
-        hw = {e.key: load_hw(e, prior) for e in exps}
+    for method, prior in COMBOS:
+        cov = [e for e in exps if cache_path(method, prior, e.key).exists()]
+        print(f"{method}/{prior}: {len(cov)} of {len(exps)} experiments in the soft-output cache", flush=True)
+        if not cov:
+            continue
+        by_key = {e.key: e for e in cov}
+        groups = collections.defaultdict(list)      # (d, basis, r) -> experiments over patches
+        for e in cov:
+            groups[(e.distance, e.basis, e.rounds)].append(e)
+        hw = {e.key: load_hw(e, method, prior) for e in cov}
         pairs = []                                   # (axis, source label, source arrays, target experiment)
-        for e in exps:
+        for e in cov:
             pairs.append(("same", e.key, hw[e.key], e))
-            pairs.append(("sim", f"sim:{e.key}", load_sim(prior, e.key), e))
+            if method == "mwpm_gap":
+                pairs.append(("sim", f"sim:{e.key}", load_sim(prior, e.key), e))
             other = e.key.replace(f"/{e.basis}/", "/Z/" if e.basis == "X" else "/X/")
             if other in by_key:
                 pairs.append(("basis", other, hw[other], e))
@@ -117,8 +133,9 @@ def main():
         fits, certs = {}, {}                          # per source label: calibrators, certified thresholds
         for axis, label, src, tgt in pairs:
             base = {"axis": axis, "source": label, "target": tgt.key, "distance": tgt.distance, "basis": tgt.basis,
-                    "rounds": tgt.rounds, "patch": tgt.patch, "prior": prior}
+                    "rounds": tgt.rounds, "patch": tgt.patch, "method": method, "prior": prior}
             s_te, w_te = hw[tgt.key]["test"]
+            s_unlabelled = hw[tgt.key]["train"][0]
             if label not in fits:
                 fits[label] = {c.name: c().fit(*src["train"]) for c in (Platt, Isotonic)}
             for name, c in fits[label].items():
@@ -128,16 +145,19 @@ def main():
                 if (label, alpha) not in certs:
                     certs[(label, alpha)] = certify(src["train"][0], src["calibrate"][0], src["calibrate"][1], alpha, DELTA)
                 res = certs[(label, alpha)]
-                row = {**base, "alpha": alpha, "src_cal_n": src["calibrate"][0].size}
-                if res is None:
-                    g_rows.append({**row, "certified": 0, "keep": "", "test_n": "", "test_errors": "", "test_rate": "",
-                                   "exceed": "", "sig_exceed": ""})
-                    continue
-                lam, keep = res
-                ev = evaluate(lam, s_te, w_te, alpha)
-                g_rows.append({**row, "certified": 1, "keep": keep, "test_n": ev["n"], "test_errors": ev["errors"],
-                               "test_rate": ev["rate"], "exceed": ev["exceed"], "sig_exceed": ev["sig_exceed"]})
-        print(f"prior {prior}: {len(pairs)} source-target pairs ({time.time() - t0:.0f}s)", flush=True)
+                for transfer in TRANSFERS:
+                    row = {**base, "alpha": alpha, "transfer": transfer, "src_cal_n": src["calibrate"][0].size}
+                    if res is None:
+                        g_rows.append({**row, "certified": 0, "keep": "", "test_n": "", "test_errors": "",
+                                       "test_rate": "", "exceed": "", "sig_exceed": ""})
+                        continue
+                    lam, keep = res
+                    if transfer == "keep_fraction":
+                        lam = threshold_for_keep(s_unlabelled, keep)
+                    ev = evaluate(lam, s_te, w_te, alpha)
+                    g_rows.append({**row, "certified": 1, "keep": keep, "test_n": ev["n"], "test_errors": ev["errors"],
+                                   "test_rate": ev["rate"], "exceed": ev["exceed"], "sig_exceed": ev["sig_exceed"]})
+        print(f"{method}/{prior}: {len(pairs)} source-target pairs ({time.time() - t0:.0f}s)", flush=True)
 
     for name, rows, fields in (("m5_drift.csv", g_rows, G_FIELDS), ("m5_calibration.csv", c_rows, C_FIELDS)):
         with (RES / name).open("w", newline="") as f:

@@ -26,12 +26,17 @@ def save(method: str, prior: str, key: str, pred: np.ndarray, **arrays) -> pathl
 
 
 def load(method: str, prior: str, key: str) -> dict:
-    """{'pred': bool, 'q': P(prediction wrong), ...}; 'gap' for mwpm_gap, 'p_flip' for exact."""
+    """{'pred': bool, 'q': P(prediction wrong), ...}: 'gap' for mwpm_gap and bm_gap, 'p_flip' for exact, 'logit' and
+    'fit_mask' (shots used in training) for nn."""
     z = np.load(cache_path(method, prior, key))
     out = {k: z[k] for k in z.files}
     out["pred"] = np.unpackbits(out["pred"], count=int(out["shots"]), bitorder="little").astype(bool)
+    if "fit_mask" in out:                     # shots a learned decoder was trained on
+        out["fit_mask"] = np.unpackbits(out["fit_mask"], count=int(out["shots"]), bitorder="little").astype(bool)
     if "gap" in out:
         out["q"] = 1.0 / (1.0 + np.exp(out["gap"].astype(np.float64)))
+    elif "logit" in out:
+        out["q"] = 1.0 / (1.0 + np.exp(np.abs(out["logit"].astype(np.float64))))
     elif "p_flip" in out:
         out["q"] = np.minimum(out["p_flip"], 1 - out["p_flip"])
     return out
