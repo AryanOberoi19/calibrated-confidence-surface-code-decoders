@@ -103,7 +103,8 @@ def overview():
         "whether that confidence can be turned into **abort thresholds with a statistical guarantee**: discard the "
         "least trustworthy runs so that the logical error rate among the kept runs is at most α, with probability "
         "at least 1 − δ. It is evaluated on Google's public data from the Willow chip "
-        "(420 surface-code memory experiments, 50,000 shots each), with the MWPM logical gap as the confidence score.")
+        "(420 surface-code memory experiments, 50,000 shots each). The main confidence score is the MWPM logical gap; "
+        "a belief-matching gap and a small learned decoder are compared with it on subsets of the data.")
     g = csv("m4_guarantees.csv")
     sel = g[(g.method == "mwpm_gap") & (g.prior == "rl") & (g.alpha == 0.01) & g.keep.notna()]
     d = csv("m5_drift.csv")
@@ -122,14 +123,36 @@ def overview():
     st.caption("Share of abort thresholds whose Test error among kept shots is significantly above the target "
                "α = 1% (one-sided 95% Clopper-Pearson). MWPM gap, RL-optimized prior.")
     st.markdown(
-        "- **RQ1, calibration.** The raw gap is overconfident; temperature, Platt or isotonic recalibration fitted on "
-        "held-out shots fixes most of it. At one round, the recalibrated gap matches the exact Bayesian posterior.\n"
-        "- **RQ2, guarantees.** Learn-then-Test thresholds keep their promise on unseen shots; trusting the decoder's "
-        "own confidence does not.\n"
+        "- **RQ1, calibration.** The raw MWPM gap is overconfident; temperature, Platt or isotonic recalibration fitted "
+        "on held-out shots fixes most of it. At one round, the recalibrated gap matches the exact Bayesian posterior. "
+        "The learned decoder's raw confidence is already close to calibrated; the belief-matching gap is more "
+        "overconfident than the MWPM gap until recalibrated, but ranks shots better.\n"
+        "- **RQ2, guarantees.** Learn-then-Test thresholds keep their promise on unseen shots for all three scores; "
+        "trusting the decoder's own confidence does not. The stronger scores keep more shots under the same guarantee.\n"
         "- **RQ3, drift.** The guarantee is local: moved to another patch, basis or noise model, about one "
-        "certified threshold in ten fails at α ≥ 1%, and thresholds certified on simulated data fail badly.\n\n"
+        "certified threshold in ten fails at α ≥ 1%, and thresholds certified on simulated data fail badly. Keeping "
+        "the same fraction of shots instead of the same gap threshold makes transfer worse, not better.\n\n"
         "Split discipline: calibrators are fitted on a Train split, thresholds chosen on a Calibrate split, and every "
         "number here is measured on a Test split that neither saw.")
+    cal = csv("m4_calibration.csv")
+    rows = []
+    for m in ("mwpm_gap", "bm_gap", "nn"):
+        c = cal[(cal.method == m) & (cal.prior == "rl") & (cal.distance == 3) & (cal.rounds == 10)]
+        if c.empty:
+            continue
+        raw_c, platt_c = c[c.calibrator == "raw"], c[c.calibrator == "platt"]
+        lt = g[(g.method == m) & (g.prior == "rl") & (g.distance == 3) & (g.rounds == 10) & (g.alpha == 0.01)
+               & (g.rule == "ltt")]
+        n_test = raw_c.set_index("key").test_n
+        rows.append({"Score": METHOD_NAME[m], "Logical error": raw_c.test_errors.sum() / raw_c.test_n.sum(),
+                     "ECE, raw": raw_c.ece.mean(), "NLL after Platt": platt_c.nll.mean(),
+                     "Kept at α = 1%, certified": (lt.test_n.fillna(0).values / n_test.reindex(lt.key).values).mean()})
+    if rows:
+        st.markdown("**Three confidence scores** at d = 3, r = 10 (RL prior, Test split, 9 patches × 2 bases)")
+        st.dataframe(pd.DataFrame(rows).style.format({"Logical error": "{:.2%}", "ECE, raw": "{:.4f}",
+                                                      "NLL after Platt": "{:.4f}",
+                                                      "Kept at α = 1%, certified": "{:.0%}"}),
+                     hide_index=True, width="stretch")
     st.caption("Data: Google Quantum AI, Data for \"Quantum error correction below the surface code threshold\", "
                "Zenodo 10.5281/zenodo.13273331, CC BY 4.0. Code: github.com/AryanOberoi19/"
                "calibrated-confidence-surface-code-decoders.")
