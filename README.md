@@ -1,14 +1,12 @@
 # qec-decoder-calibration
 
-Calibrated confidence and certified abort thresholds for surface-code decoders, evaluated on Google's public Willow hardware data. Intelligent Systems-II course project.
+Calibrated confidence and certified abort thresholds for surface-code decoders, evaluated on Google's public Willow hardware data.
 
 **Live app:** https://calibrated-qec-decoders.streamlit.app
 
-Planning documents live one folder up: `qec-decoder-calibration-spec.md` (the spec), `related-work.md`, `study-guide.md`, the report (`report/` sources, `QEC-Calibration_Report.pdf`) and the earlier Introduction / Literature Review / Methodology PDF.
-
 ## Status
 
-All milestones done (M0–M5). Three confidence scores are compared: the MWPM logical gap (all 420 experiments), a belief-matching gap (112 experiments, r in 1/10/30/50) and a small learned decoder (72 experiments at d=3). Calibration and certified thresholds (RQ1, RQ2): `results/m4_summary.md`; drift, including keep-fraction transfer (RQ3): `results/m5_summary.md`. The app is deployed at https://calibrated-qec-decoders.streamlit.app. The report (LaTeX sources and PDF) is one folder up, next to the spec.
+All milestones done (M0–M5). Three confidence scores are compared: the MWPM logical gap (all 420 experiments), a belief-matching gap (112 experiments, r in 1/10/30/50) and a small learned decoder (72 experiments at d=3). Calibration and certified thresholds (RQ1, RQ2): `results/m4_summary.md`; drift, including keep-fraction transfer (RQ3): `results/m5_summary.md`. The app is deployed at https://calibrated-qec-decoders.streamlit.app. 
 
 ## Quick start
 
