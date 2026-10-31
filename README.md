@@ -6,7 +6,7 @@ Calibrated confidence and certified abort thresholds for surface-code decoders, 
 
 ## Status
 
-All milestones done (M0–M5). Three confidence scores are compared: the MWPM logical gap (all 420 experiments), a belief-matching gap (112 experiments, r in 1/10/30/50) and a small learned decoder (72 experiments at d=3). Calibration and certified thresholds (RQ1, RQ2): `results/m4_summary.md`; drift, including keep-fraction transfer (RQ3): `results/m5_summary.md`. The app is deployed at https://calibrated-qec-decoders.streamlit.app. 
+All milestones done (M0–M6). Three confidence scores are compared: the MWPM logical gap (all 420 experiments), a belief-matching gap (112 experiments, r in 1/10/30/50) and a small learned decoder (72 experiments at d=3). Calibration and certified thresholds (RQ1, RQ2): `results/m4_summary.md`; drift, including keep-fraction transfer (RQ3): `results/m5_summary.md`; early abort learned by Q-iteration and certified by Learn-then-Test (M6, extension): `results/m6_summary.md`. The app is deployed at https://calibrated-qec-decoders.streamlit.app. 
 
 ## Quick start
 
@@ -28,6 +28,9 @@ python scripts/m4_calibrate_certify.py         # calibrators (Train), Learn-then
 python scripts/m4_summary.py                   # RQ1 / RQ2 tables and figures -> results/
 python scripts/m5_drift.py                     # RQ3: certify on a source, evaluate on a shifted target (~2 min)
 python scripts/m5_summary.py                   # RQ3 tables and figures -> results/
+python scripts/m6_prefix_gaps.py               # M6: prefix gaps for early abort, r in 10/30/50 (~2 min on 10 workers)
+python scripts/m6_early_abort.py               # M6: policies (Q-iteration), Learn-then-Test, evaluation on Test
+python scripts/m6_summary.py                   # M6 tables and figures -> results/
 python scripts/build_app_data.py               # small committed data for the web app -> app/data/
 streamlit run app/streamlit_app.py             # web app (deployment: docs/app.md)
 python -m pytest -q
@@ -41,7 +44,7 @@ Details: `docs/environment.md` (setup) and `docs/data.md` (dataset).
 docs/          environment.md, data.md, generated data inventory
 data/raw/      the extracted Zenodo archive (git-ignored)
 splits/        committed split manifest (seed, shares, per-experiment checksums)
-src/qeccal/    data, dem, decoders, exact, soft, calibration, guarantees, learned
+src/qeccal/    data, dem, decoders, exact, soft, calibration, guarantees, learned, sequential
 scripts/       one script per figure or table; check_env, inspect_archive, m0_threshold
 notebooks/     exploration only, never load-bearing
 results/       committed metrics and figures
