@@ -2,15 +2,16 @@
 
 Live: https://calibrated-qec-decoders.streamlit.app (Streamlit Community Cloud, redeploys on every push to `main`).
 
-`app/streamlit_app.py` has five views:
+`app/streamlit_app.py` has six views:
 
 - **Overview**: headline numbers, computed live from `results/`.
 - **Shot explorer**: 300 Test shots from each of 8 experiments. Each shot is decoded live: the logical gap, raw and Platt-calibrated P(wrong), Google's five predictions, and a 3D space-time plot of the detection events and the MWPM matching.
 - **Calibration**: Test reliability diagrams and ECE, Brier and NLL per calibrator, by distance, round count, prior and soft output: the MWPM gap everywhere, the exact posterior at r=1, the belief-matching gap (RL prior, r in 1, 10, 30, 50) and the learned decoder (d=3, same round counts).
 - **Postselection**: pick an experiment, α and δ. The view runs Learn-then-Test live on the Calibrate split and compares it on the Test split with the plug-in, raw-q and Platt-q rules.
 - **Drift**: how often certified thresholds miss α after a shift, and a patch-to-patch matrix. Toggles: prior, score (MWPM gap, belief-matching gap, learned decoder) and how the threshold is moved to the target (the same gap threshold, or the same keep fraction).
+- **Early abort** (extension): per distance and round count, how many experiments each rule certifies at the chosen α and how many more shots per round early abort keeps; for one experiment, the three rules on Test, the share of shots still running round by round and the learned abort thresholds; and how often certified policies miss α after a shift, next to the static thresholds. Reads `results/m6_early_abort.csv`, `m6_policies.csv` and `m6_drift.csv`.
 
-The app never needs the raw archive. It reads `app/data/` (6.7 MB, committed) and `results/*.csv`.
+The app never needs the raw archive. It reads `app/data/` (6.7 MB, committed) and `results/*.csv`; the Early abort view needs no app data of its own.
 
 ## Run locally
 

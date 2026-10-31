@@ -70,3 +70,15 @@ Test shots, mid-run checkpoint. Spearman: rank correlation between the prefix ga
 | 7 | 10 | 5 | 0.29 | 0.50 |
 | 7 | 30 | 15 | 0.38 | 0.61 |
 | 7 | 50 | 25 | 0.40 | 0.65 |
+## Under shift (RQ3 for policies)
+
+Policy certified on the source (Train, Calibrate), played unchanged on the target's Test split, with the source's bin edges. Each cell: share of certified pairs whose target Test error significantly exceeds alpha, then the number of certified pairs; early abort first, the static thresholds of M5 (threshold transfer, same round counts 10, 30, 50) second. Pairs sharing a source are not independent. Rows: `results/m6_drift.csv`.
+
+| Shift | alpha = 1e-3 | alpha = 1e-2 | alpha = 1e-1 |
+|---|---|---|---|
+| Same experiment | 0% / 3 vs 0% / 4 | 0% / 37 vs 0% / 36 | 0% / 78 vs 0% / 73 |
+| Other patch | 0% / 3 vs 0% / 6 | 13% / 186 vs 12% / 183 | 19% / 456 vs 19% / 416 |
+| Other basis | 0% / 3 vs 0% / 4 | 8% / 37 vs 6% / 36 | 18% / 78 vs 15% / 73 |
+| Other patches pooled | 0% / 18 vs 0% / 18 | 7% / 41 vs 6% / 36 | 19% / 78 vs 19% / 75 |
+| Simulated from the RL DEM | 29% / 7 vs 0% / 4 | 28% / 39 vs 20% / 40 | 49% / 80 vs 44% / 77 |
+

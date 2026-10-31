@@ -131,7 +131,10 @@ def overview():
         "trusting the decoder's own confidence does not. The stronger scores keep more shots under the same guarantee.\n"
         "- **RQ3, drift.** The guarantee is local: moved to another patch, basis or noise model, about one "
         "certified threshold in ten fails at α ≥ 1%, and thresholds certified on simulated data fail badly. Keeping "
-        "the same fraction of shots instead of the same gap threshold makes transfer worse, not better.\n\n"
+        "the same fraction of shots instead of the same gap threshold makes transfer worse, not better.\n"
+        "- **Extension, early abort.** Stopping doomed runs part-way through, with a policy learned by Q-iteration and "
+        "certified the same way, keeps up to about twice as many shots per round of hardware time in long distance-3 "
+        "runs, with the guarantee intact; at distances 5 and 7 it adds nothing (see the Early abort tab).\n\n"
         "Split discipline: calibrators are fitted on a Train split, thresholds chosen on a Calibrate split, and every "
         "number here is measured on a Test split that neither saw.")
     cal = csv("m4_calibration.csv")
@@ -379,9 +382,134 @@ def drift():
     st.caption("Blue: the target's Test error is below α; orange: above (the promise failed on that target). "
                f"Empty cells: not certifiable on the source. {METHOD_NAME[method]}; δ = 0.05.")
 
+EA_RULES = {"static": ("Static threshold (M4)", C[1]), "final_only": ("Same keep rule, no abort", GREY),
+            "early_abort": ("Early abort (Q-iteration)", C[0])}
+
+
+def early_abort():
+    st.markdown(
+        "**Extension (reinforcement learning).** The thresholds above decide after the last round, so a shot that will "
+        "be discarded still uses the whole run. Here the decision is taken every 5 rounds, from the **prefix gap** "
+        "(the logical gap of the rounds measured so far). Abort-or-continue is an optimal-stopping MDP: state = "
+        "(checkpoint, prefix-gap bin), abort is worth 0, continuing costs ρ per round, and a shot that reaches the end is "
+        "kept if its final gap clears a threshold. The policy maximises kept shots per round of hardware time "
+        "(Dinkelbach's method on ρ) and is learned by Q-iteration on logged Train shots: aborting does not change "
+        "what the qubits did, so every recorded shot shows where continuing would have led. Learn-then-Test then "
+        "certifies one policy per experiment on the Calibrate split, exactly as it certifies a threshold.")
+    ea = csv("m6_early_abort.csv")
+    pol = csv("m6_policies.csv")
+    alphas = sorted(ea.alpha.unique())
+    alpha = st.select_slider("Target α (error rate among kept shots)", alphas, value=0.01 if 0.01 in alphas else alphas[0],
+                             format_func=lambda a: f"{a:g}", key="ea_alpha")
+    rows = []
+    for (d, r), g in ea[ea.alpha == alpha].groupby(["distance", "rounds"]):
+        p = g.pivot_table(index="key", columns="rule", values=["certified", "throughput", "aborted"])
+        cert = {rule: int(p[("certified", rule)].sum()) for rule in EA_RULES}
+        if sum(cert.values()) == 0:
+            continue
+        both = p[(p[("certified", "final_only")] == 1) & (p[("certified", "early_abort")] == 1)]
+        ratio = (both[("throughput", "early_abort")] / both[("throughput", "final_only")]).median() if len(both) else np.nan
+        e_c = p[p[("certified", "early_abort")] == 1]
+        rows.append({"d": d, "r": r,
+                     "Certified: static / no abort / early abort": f"{cert['static']} / {cert['final_only']} / "
+                                                                   f"{cert['early_abort']} of {len(p)}",
+                     "Kept per round, early abort ÷ no abort": ratio,
+                     "Shots stopped early": e_c[("aborted", "early_abort")].mean() if len(e_c) else np.nan})
+    if rows:
+        st.dataframe(pd.DataFrame(rows).style.format({"Kept per round, early abort ÷ no abort": "{:.2f}",
+                                                      "Shots stopped early": "{:.0%}"}, na_rep="-"),
+                     hide_index=True, width="stretch")
+    else:
+        st.info("Nothing is certifiable at this α.")
+    st.caption("Medians over experiments where both rules certify (MWPM gap and prefix gap, RL prior, Test split). "
+               "Uncertified experiments keep nothing. 'No abort' is the same policy family with ρ = 0, so the ratio "
+               "isolates what aborting adds.")
+
+    st.markdown("**One experiment**")
+    c1, c2, c3, c4 = st.columns(4)
+    d = c1.selectbox("Distance", [3, 5, 7], key="ea_d")
+    r = c2.selectbox("Rounds", sorted(ea.rounds.unique()), index=2, key="ea_r")
+    basis = c3.selectbox("Basis", ["X", "Z"], index=1, key="ea_b")
+    patches = sorted(ea[ea.distance == d].patch.unique(), key=lambda q: tuple(int(x) for x in q[1:].split("_")))
+    patch = c4.selectbox("Patch", patches, key="ea_p")
+    key = f"d{d}_at_{patch}/{basis}/r{r:02d}"
+    sub = ea[(ea.key == key) & (ea.alpha == alpha)].set_index("rule")
+    if sub.empty:
+        st.info("No such experiment.")
+        return
+    table = []
+    for rule, (name, _) in EA_RULES.items():
+        x = sub.loc[rule]
+        if not x.certified:
+            table.append({"Rule": name, "Certified": "no"})
+            continue
+        table.append({"Rule": name, "Certified": "yes", "Kept (Test)": f"{x.keep:.1%}",
+                      "Errors / kept": f"{int(x.test_errors)} / {int(x.test_n):,}", "Error rate": f"{x.test_rate:.2e}",
+                      "Rounds per attempt": f"{x.rounds_mean:.1f}", "Kept per 1000 rounds": f"{1000 * x.throughput:.2f}",
+                      "Meets α?": "yes" if x.test_rate <= alpha else ("no, significantly" if x.sig_exceed else "no")})
+    st.dataframe(pd.DataFrame(table), hide_index=True, width="stretch")
+    pr = pol[(pol.key == key) & (pol.alpha == alpha)]
+    if pr.empty:
+        st.info("Early abort is not certified for this experiment at this α.")
+    else:
+        pr = pr.iloc[0]
+        cps = json.loads(pr.checkpoints)
+        share = np.array(json.loads(pr.abort_share_test), dtype=float)
+        below = [np.nan if v is None else v for v in json.loads(pr.abort_below)]
+        alive = 1 - np.concatenate([[0.0], np.cumsum(share)])
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=[0, *cps, r], y=[1.0, *alive[1:], alive[-1]], mode="lines", line_shape="hv",
+                                 name="Early abort: still running", line=dict(color=C[0], width=2)))
+        fig.add_trace(go.Scatter(x=[0, r], y=[1, 1], mode="lines", name="Static: still running",
+                                 line=dict(color=C[1], width=2)))
+        for rule, sym in (("early_abort", "circle"), ("static", "square")):
+            if sub.loc[rule].certified:
+                fig.add_trace(go.Scatter(x=[r], y=[sub.loc[rule].keep], mode="markers", name=f"{EA_RULES[rule][0]}: kept",
+                                         marker=dict(color=EA_RULES[rule][1], size=11, symbol=sym)))
+        fig.update_xaxes(title="Round")
+        fig.update_yaxes(title="Share of Test shots", range=[0, 1.05], tickformat=".0%")
+        c1, c2 = st.columns(2)
+        c1.plotly_chart(fig_layout(fig, 400, title="Shots still running"), width="stretch")
+        fig = go.Figure(go.Scatter(x=cps, y=below, mode="lines+markers", name="abort below this prefix gap",
+                                   line=dict(color=C[1], width=2), connectgaps=False))
+        fig.update_xaxes(title="Checkpoint round")
+        fig.update_yaxes(title="Prefix gap")
+        c2.plotly_chart(fig_layout(fig, 400, title="The learned abort rule"), width="stretch")
+        st.caption("A shot is stopped at a checkpoint if its prefix gap is below the threshold shown (no point: the "
+                   "policy never aborts there). The static rule runs every shot to the end.")
+
+    try:
+        dr = csv("m6_drift.csv")
+    except FileNotFoundError:
+        return
+    st.markdown("**Under shift.** Certify a policy on a source, play it unchanged on a shifted target (dashed: the "
+                "static thresholds of the Drift tab on the same round counts).")
+    m5 = csv("m5_drift.csv")
+    m5 = m5[(m5.method == "mwpm_gap") & (m5.prior == "rl") & (m5.transfer == "threshold") & m5.rounds.isin(ea.rounds.unique())
+            & (m5.certified == 1)]
+    names = {"same": "Same experiment", "patch": "Other patch", "basis": "Other basis", "pooled": "Other patches pooled",
+             "sim": "Simulated from the RL DEM"}
+    cols = {"same": C[0], "patch": C[1], "basis": C[2], "pooled": C[3], "sim": "#52514e"}
+    fig = go.Figure()
+    for src, dash in ((dr[dr.certified == 1], None), (m5, "dash")):
+        agg = src.groupby(["axis", "alpha"]).agg(sig=("sig_exceed", "mean"), n=("sig_exceed", "size")).reset_index()
+        for axis, name in names.items():
+            a = agg[agg.axis == axis]
+            if a.empty:
+                continue
+            fig.add_trace(go.Scatter(x=a.alpha, y=100 * a.sig, mode="lines+markers",
+                                     name=name if dash is None else f"{name} (static)",
+                                     line=dict(color=cols[axis], width=2, dash=dash), customdata=a.n,
+                                     hovertemplate="α %{x:g}<br>significant %{y:.0f}%<br>%{customdata} certified pairs"
+                                                   "<extra></extra>", showlegend=dash is None))
+    fig.add_hline(y=5, line=dict(color=GREY, dash="dot", width=1), annotation_text="δ = 5%")
+    fig.update_xaxes(type="log", title="Target α")
+    fig.update_yaxes(title="Significant exceedance (%)")
+    st.plotly_chart(fig_layout(fig, 420, title="Early-abort policies under shift"), width="stretch")
+
 
 st.title("Calibrated confidence for surface-code decoders")
-tabs = st.tabs(["Overview", "Shot explorer", "Calibration", "Postselection", "Drift"])
-for tab, view in zip(tabs, (overview, shot_explorer, calibration, postselection, drift)):
+tabs = st.tabs(["Overview", "Shot explorer", "Calibration", "Postselection", "Drift", "Early abort"])
+for tab, view in zip(tabs, (overview, shot_explorer, calibration, postselection, drift, early_abort)):
     with tab:
         view()

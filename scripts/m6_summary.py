@@ -1,8 +1,9 @@
 """Summarise M6: early abort learned by Q-iteration and certified by Learn-then-Test (spec section 8.8).
 
     python scripts/m6_summary.py
-Reads results/m6_early_abort.csv, m6_policies.csv, m6_qcheck.csv and the prefix and soft caches; writes
-results/m6_summary.md, results/m6_gain.png and results/m6_policy.png.
+Reads results/m6_early_abort.csv, m6_policies.csv, m6_qcheck.csv, m6_drift.csv (if present; scripts/m6_drift.py),
+m5_drift.csv and the prefix and soft caches; writes results/m6_summary.md, results/m6_gain.png, results/m6_policy.png
+and results/m6_drift.png.
 """
 import json
 import pathlib
@@ -24,6 +25,8 @@ RES = REPO / "results"
 PREFIX = RES / "cache" / "prefix" / "rl"
 EXAMPLE, EXAMPLE_ALPHA = "d3_at_q4_5/Z/r50", 0.1
 RULES = ("static", "final_only", "early_abort")
+AXES = {"same": "Same experiment", "patch": "Other patch", "basis": "Other basis", "pooled": "Other patches pooled",
+        "sim": "Simulated from the RL DEM"}
 
 
 def fmt_a(a):
@@ -46,6 +49,36 @@ def informativeness():
                      "lift": kept[low].mean() / kept.mean()})
     return pd.DataFrame(rows).groupby(["distance", "rounds"]).agg(t=("t", "first"), spearman=("spearman", "mean"),
                                                                   lift=("lift", "mean")).reset_index()
+
+
+def drift_section(L):
+    """Certified policies moved to a shifted target, next to M5's static thresholds on the same round counts."""
+    path = RES / "m6_drift.csv"
+    if not path.exists():
+        return None
+    dr = pd.read_csv(path)
+    m5 = pd.read_csv(RES / "m5_drift.csv")
+    m5 = m5[(m5.method == "mwpm_gap") & (m5.prior == "rl") & (m5.transfer == "threshold")
+            & m5.rounds.isin(dr.rounds.unique())]
+    L += ["## Under shift (RQ3 for policies)", "",
+          "Policy certified on the source (Train, Calibrate), played unchanged on the target's Test split, with the "
+          "source's bin edges. Each cell: share of certified pairs whose target Test error significantly exceeds alpha, "
+          "then the number of certified pairs; early abort first, the static thresholds of M5 (threshold transfer, same "
+          "round counts 10, 30, 50) second. Pairs sharing a source are not independent. Rows: `results/m6_drift.csv`.", "",
+          "| Shift | " + " | ".join(f"alpha = {fmt_a(a)}" for a in (1e-3, 1e-2, 1e-1)) + " |", "|---|---|---|---|"]
+    out = []
+    for axis, name in AXES.items():
+        cells = []
+        for a in (1e-3, 1e-2, 1e-1):
+            e = dr[(dr.axis == axis) & np.isclose(dr.alpha, a) & (dr.certified == 1)]
+            s = m5[(m5.axis == axis) & np.isclose(m5.alpha, a) & (m5.certified == 1)]
+            cells.append(f"{100 * e.sig_exceed.mean():.0f}% / {len(e)} vs {100 * s.sig_exceed.mean():.0f}% / {len(s)}"
+                         if len(e) and len(s) else "-")
+            out.append({"axis": axis, "alpha": a, "early": e.sig_exceed.mean() if len(e) else np.nan, "n_e": len(e),
+                        "static": s.sig_exceed.mean() if len(s) else np.nan, "n_s": len(s)})
+        L.append(f"| {name} | " + " | ".join(cells) + " |")
+    L.append("")
+    return pd.DataFrame(out)
 
 
 def main():
@@ -121,6 +154,7 @@ def main():
           "| d | r | Checkpoint round | Spearman | Lift |", "|---|---|---|---|---|"]
     for _, r in info.iterrows():
         L.append(f"| {int(r.distance)} | {int(r.rounds)} | {int(r.t)} | {r.spearman:.2f} | {r.lift:.2f} |")
+    drift_rows = drift_section(L)
     (RES / "m6_summary.md").write_text("\n".join(L) + "\n")
 
     # --- figures ----------------------------------------------------------------------------------------------------
@@ -153,6 +187,26 @@ def main():
     fig.tight_layout()
     fig.savefig(RES / "m6_gain.png")
     plt.close(fig)
+
+    if drift_rows is not None:
+        fig, axes = plt.subplots(1, 2, figsize=(7.4, 2.6), sharey=True)
+        x = np.arange(len(AXES))
+        for ax, a in zip(axes, (1e-2, 1e-1)):
+            t = drift_rows[np.isclose(drift_rows.alpha, a)].set_index("axis").reindex(list(AXES))
+            ax.bar(x - 0.2, 100 * t.static, 0.38, color=plotting.C[1], label="static threshold (M5)")
+            ax.bar(x + 0.2, 100 * t.early, 0.38, color=plotting.C[0], label="early-abort policy")
+            for xi, (v, n) in enumerate(zip(t.early, t.n_e)):
+                if np.isfinite(v):
+                    ax.text(xi + 0.2, 100 * v + 1, f"{n}", ha="center", fontsize=6.5, color=plotting.INK2)
+            ax.axhline(5, color=plotting.MUTED, lw=0.8, ls="--")
+            ax.set_xticks(x, ["Same\nexperiment", "Other\npatch", "Other\nbasis", "Pooled\npatches",
+                              "Simulation\n(RL DEM)"], fontsize=7)
+            ax.set_title(f"alpha = {fmt_a(a)}")
+        axes[0].set_ylabel("certified pairs failing\nsignificantly (%)")
+        axes[0].legend(loc="upper left", fontsize=7)
+        fig.tight_layout()
+        fig.savefig(RES / "m6_drift.png")
+        plt.close(fig)
 
     # example policy
     p = pol[(pol.key == EXAMPLE) & (np.isclose(pol.alpha, EXAMPLE_ALPHA))].iloc[0]

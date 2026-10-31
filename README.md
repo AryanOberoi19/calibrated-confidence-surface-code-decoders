@@ -30,6 +30,7 @@ python scripts/m5_drift.py                     # RQ3: certify on a source, evalu
 python scripts/m5_summary.py                   # RQ3 tables and figures -> results/
 python scripts/m6_prefix_gaps.py               # M6: prefix gaps for early abort, r in 10/30/50 (~2 min on 10 workers)
 python scripts/m6_early_abort.py               # M6: policies (Q-iteration), Learn-then-Test, evaluation on Test
+python scripts/m6_drift.py                     # M6: certified policies under shift, as in M5 (~3 min)
 python scripts/m6_summary.py                   # M6 tables and figures -> results/
 python scripts/build_app_data.py               # small committed data for the web app -> app/data/
 streamlit run app/streamlit_app.py             # web app (deployment: docs/app.md)
