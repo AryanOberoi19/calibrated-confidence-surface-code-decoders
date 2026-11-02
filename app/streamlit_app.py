@@ -98,6 +98,7 @@ def fig_layout(fig, height=420, **kw):
 
 # ------------------------------------------------------------------------------------------- views
 def overview():
+    '''
     st.markdown(
         "Quantum error correction decoders can report how confident they are in each correction. This project asks "
         "whether that confidence can be turned into **abort thresholds with a statistical guarantee**: discard the "
@@ -137,6 +138,7 @@ def overview():
         "runs, with the guarantee intact; at distances 5 and 7 it adds nothing (see the Early abort tab).\n\n"
         "Split discipline: calibrators are fitted on a Train split, thresholds chosen on a Calibrate split, and every "
         "number here is measured on a Test split that neither saw.")
+    '''
     cal = csv("m4_calibration.csv")
     rows = []
     for m in ("mwpm_gap", "bm_gap", "nn"):
@@ -387,6 +389,7 @@ EA_RULES = {"static": ("Static threshold (M4)", C[1]), "final_only": ("Same keep
 
 
 def early_abort():
+    '''
     st.markdown(
         "**Extension (reinforcement learning).** The thresholds above decide after the last round, so a shot that will "
         "be discarded still uses the whole run. Here the decision is taken every 5 rounds, from the **prefix gap** "
@@ -396,6 +399,7 @@ def early_abort():
         "(Dinkelbach's method on ρ) and is learned by Q-iteration on logged Train shots: aborting does not change "
         "what the qubits did, so every recorded shot shows where continuing would have led. Learn-then-Test then "
         "certifies one policy per experiment on the Calibrate split, exactly as it certifies a threshold.")
+    '''
     ea = csv("m6_early_abort.csv")
     pol = csv("m6_policies.csv")
     alphas = sorted(ea.alpha.unique())
@@ -510,6 +514,6 @@ def early_abort():
 
 st.title("Calibrated confidence for surface-code decoders")
 tabs = st.tabs(["Overview", "Shot explorer", "Calibration", "Postselection", "Drift", "Early abort"])
-for tab, view in zip(tabs, (overview, shot_explorer, calibration, postselection, drift, early_abort)):
+for tab, view in zip(tabs, (overview, shot_explorer, calibration, postselection, drift, '''early_abort''')):
     with tab:
         view()
