@@ -106,15 +106,17 @@ def overview():
         "at least 1 − δ. It is evaluated on Google's public data from the Willow chip "
         "(420 surface-code memory experiments, 50,000 shots each). The main confidence score is the MWPM logical gap; "
         "a belief-matching gap and a small learned decoder are compared with it on subsets of the data.")
+    '''
     g = csv("m4_guarantees.csv")
     sel = g[(g.method == "mwpm_gap") & (g.prior == "rl") & (g.alpha == 0.01) & g.keep.notna()]
     d = csv("m5_drift.csv")
     dsel = d[(d.method == "mwpm_gap") & (d.transfer == "threshold") & (d.prior == "rl") & (d.alpha == 0.01)
              & (d.certified == 1)]
-    c1, c2, c3 = st.columns(3)
+    #c1, c2, c3 = st.columns(3)
     ltt = sel[sel.rule == "ltt"]
     raw = sel[sel.rule == "naive_raw"]
     patch = dsel[dsel.axis == "patch"]
+    '''
     c1.metric("Certified, same experiment", f"{100 * ltt.sig_exceed.mean():.0f}%",
               help=f"Learn-then-Test; {len(ltt)} certified experiments")
     c2.metric("Trusting the decoder's confidence", f"{100 * raw.sig_exceed.mean():.0f}%",
@@ -123,6 +125,8 @@ def overview():
               help=f"{len(patch)} source-target pairs")
     st.caption("Share of abort thresholds whose Test error among kept shots is significantly above the target "
                "α = 1% (one-sided 95% Clopper-Pearson). MWPM gap, RL-optimized prior.")
+    '''
+    '''
     st.markdown(
         "- **RQ1, calibration.** The raw MWPM gap is overconfident; temperature, Platt or isotonic recalibration fitted "
         "on held-out shots fixes most of it. At one round, the recalibrated gap matches the exact Bayesian posterior. "
