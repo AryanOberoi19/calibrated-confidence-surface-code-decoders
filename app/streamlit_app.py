@@ -98,51 +98,7 @@ def fig_layout(fig, height=420, **kw):
 
 # ------------------------------------------------------------------------------------------- views
 def overview():
-    '''
-    st.markdown(
-        "Quantum error correction decoders can report how confident they are in each correction. This project asks "
-        "whether that confidence can be turned into **abort thresholds with a statistical guarantee**: discard the "
-        "least trustworthy runs so that the logical error rate among the kept runs is at most α, with probability "
-        "at least 1 − δ. It is evaluated on Google's public data from the Willow chip "
-        "(420 surface-code memory experiments, 50,000 shots each). The main confidence score is the MWPM logical gap; "
-        "a belief-matching gap and a small learned decoder are compared with it on subsets of the data.")
-    '''
     g = csv("m4_guarantees.csv")
-    sel = g[(g.method == "mwpm_gap") & (g.prior == "rl") & (g.alpha == 0.01) & g.keep.notna()]
-    d = csv("m5_drift.csv")
-    dsel = d[(d.method == "mwpm_gap") & (d.transfer == "threshold") & (d.prior == "rl") & (d.alpha == 0.01)
-             & (d.certified == 1)]
-    #c1, c2, c3 = st.columns(3)
-    ltt = sel[sel.rule == "ltt"]
-    raw = sel[sel.rule == "naive_raw"]
-    patch = dsel[dsel.axis == "patch"]
-    '''
-    c1.metric("Certified, same experiment", f"{100 * ltt.sig_exceed.mean():.0f}%",
-              help=f"Learn-then-Test; {len(ltt)} certified experiments")
-    c2.metric("Trusting the decoder's confidence", f"{100 * raw.sig_exceed.mean():.0f}%",
-              help=f"{len(raw)} experiments with a selected threshold")
-    c3.metric("Certified, moved to another patch", f"{100 * patch.sig_exceed.mean():.0f}%",
-              help=f"{len(patch)} source-target pairs")
-    st.caption("Share of abort thresholds whose Test error among kept shots is significantly above the target "
-               "α = 1% (one-sided 95% Clopper-Pearson). MWPM gap, RL-optimized prior.")
-    '''
-    '''
-    st.markdown(
-        "- **RQ1, calibration.** The raw MWPM gap is overconfident; temperature, Platt or isotonic recalibration fitted "
-        "on held-out shots fixes most of it. At one round, the recalibrated gap matches the exact Bayesian posterior. "
-        "The learned decoder's raw confidence is already close to calibrated; the belief-matching gap is more "
-        "overconfident than the MWPM gap until recalibrated, but ranks shots better.\n"
-        "- **RQ2, guarantees.** Learn-then-Test thresholds keep their promise on unseen shots for all three scores; "
-        "trusting the decoder's own confidence does not. The stronger scores keep more shots under the same guarantee.\n"
-        "- **RQ3, drift.** The guarantee is local: moved to another patch, basis or noise model, about one "
-        "certified threshold in ten fails at α ≥ 1%, and thresholds certified on simulated data fail badly. Keeping "
-        "the same fraction of shots instead of the same gap threshold makes transfer worse, not better.\n"
-        "- **Extension, early abort.** Stopping doomed runs part-way through, with a policy learned by Q-iteration and "
-        "certified the same way, keeps up to about twice as many shots per round of hardware time in long distance-3 "
-        "runs, with the guarantee intact; at distances 5 and 7 it adds nothing (see the Early abort tab).\n\n"
-        "Split discipline: calibrators are fitted on a Train split, thresholds chosen on a Calibrate split, and every "
-        "number here is measured on a Test split that neither saw.")
-    '''
     cal = csv("m4_calibration.csv")
     rows = []
     for m in ("mwpm_gap", "bm_gap", "nn"):
@@ -517,7 +473,7 @@ def early_abort():
 
 
 st.title("Calibrated confidence for surface-code decoders")
-tabs = st.tabs(["Overview", "Shot explorer", "Calibration", "Postselection", "Drift", "Early abort"])
-for tab, view in zip(tabs, (overview, shot_explorer, calibration, postselection, drift, '''early_abort''')):
+tabs = st.tabs(["Overview", "Shot explorer", "Calibration", "Postselection", "Drift"])
+for tab, view in zip(tabs, (overview, shot_explorer, calibration, postselection, drift)):
     with tab:
         view()
