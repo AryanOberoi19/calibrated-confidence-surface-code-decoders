@@ -165,7 +165,7 @@ def summarize(rows):
     (RES / "p2_blocked.md").write_text("\n".join(L))
 
     w = pd.DataFrame(wtab)
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(11, 5))
     sub = t.reset_index()
     sub = sub[(sub.method == "mwpm_gap") & (sub.prior == "rl")]
     xs = np.arange(len(ALPHAS))
@@ -178,7 +178,7 @@ def summarize(rows):
     axes[0].set_xlabel("alpha")
     axes[0].set_ylabel("significantly exceeding alpha on Test (%)")
     axes[0].set_title("MWPM gap, RL prior")
-    axes[0].legend(fontsize=7, ncol=2)
+    axes[0].legend(fontsize=7, ncol=4, loc="upper center", bbox_to_anchor=(0.5, -0.15))
     for s, ls in (("random", "-"), ("blocked", "--")):
         for k, a in enumerate(ALPHAS):
             v = w[(w.method == "mwpm_gap") & (w.prior == "rl") & (w.alpha == a) & (w.split == s)]
@@ -188,7 +188,7 @@ def summarize(rows):
     axes[1].set_xticks([1, 2, 3], ["35-40k", "40-45k", "45-50k"])
     axes[1].set_ylabel("pooled Test error among kept / alpha")
     axes[1].set_title("Learn-then-Test, by window (MWPM gap, RL prior)")
-    axes[1].legend(fontsize=7, ncol=2)
+    axes[1].legend(fontsize=7, ncol=5, loc="upper center", bbox_to_anchor=(0.5, -0.12))
     fig.tight_layout()
     fig.savefig(RES / "p2_blocked.png", dpi=200)
 
