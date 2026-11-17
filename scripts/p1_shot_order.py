@@ -131,6 +131,12 @@ def summarize(n_total):
              "the syndrome statistics and does not reach the error rate at this sample size.")
     eff = df[["ratio_x1", "ratio_x2", "edge_x1", "edge_x2", "rho_x1", "rho_x2", "ac1_x1", "ac1_x2"]].describe(
         percentiles=[0.05, 0.5, 0.95]).T[["5%", "50%", "95%", "min", "max"]]
+    g = df.groupby("rounds")
+    by_r = pd.DataFrame({"experiments": g.size(), "bh_x1 p<0.05": g.bh_x1.apply(lambda s: int((s < 0.05).sum())),
+                         "ratio_x1 median": g.ratio_x1.median(), "ac1_x1 median": g.ac1_x1.median(),
+                         "ac1_x1 max": g.ac1_x1.max(), "bh_x2 p<0.05": g.bh_x2.apply(lambda s: int((s < 0.05).sum())),
+                         "trend_x2 p<0.05": g.trend_x2.apply(lambda s: int((s < 0.05).sum())),
+                         "ratio_x2 median": g.ratio_x2.median(), "x2_rate median": g.x2_rate.median()})
     by_d = df.groupby("distance")[TESTS].apply(lambda g: (g < 0.05).sum()).assign(experiments=df.groupby("distance").size())
     lines = ["# A2: shot order and independence", "",
              f"{n} experiments, {int(df.shots.iloc[0]):,} shots each, in file order. Method and classification rules: "
@@ -143,19 +149,26 @@ def summarize(n_total):
              "ratio = variance of 50 block means / its expectation under random order (1 = none); edge = relative "
              "change of the mean, last 10,000 vs first 10,000 shots; rho = Spearman correlation with shot index; "
              "ac1 = lag-1 autocorrelation.", "", md_table(eff), "",
-             "## Experiments with p < 0.05, by distance", "", md_table(by_d), ""]
+             "## Experiments with p < 0.05, by distance", "", md_table(by_d), "",
+             "## By round count", "",
+             "Descriptive (added after the first run; no test or rule changed): experiments with p < 0.05 and median "
+             "effect sizes per round count. x2_rate is the MWPM error rate; near 0.5 a drift in the syndrome cannot "
+             "move it.", "", md_table(by_r), ""]
     (RES / "p1_shot_order.md").write_text("\n".join(lines))
 
     fig, axes = plt.subplots(2, 4, figsize=(13, 6.5))
     u = (np.arange(1, n + 1) - 0.5) / n
     for ax, t in zip(axes.flat, TESTS):
-        ax.loglog(u, np.sort(df[t].values), ".", ms=3)
+        ax.loglog(u, np.clip(np.sort(df[t].values), 1e-20, 1), ".", ms=3)
         ax.loglog([u[0], 1], [u[0], 1], "k-", lw=0.8)
-        ax.set_title(t)
+        ax.set_ylim(5e-21, 1.5)
+        ax.set_title(f"{t} (p clipped at 1e-20)")
         ax.set_xlabel("uniform quantile")
         ax.set_ylabel("p-value")
-    axes.flat[-1].hist(df["ratio_x1"], bins=40, alpha=0.6, label="x1")
-    axes.flat[-1].hist(df["ratio_x2"], bins=40, alpha=0.6, label="x2")
+    bins = np.geomspace(0.3, 300, 41)
+    axes.flat[-1].hist(df["ratio_x1"], bins=bins, alpha=0.6, label="x1")
+    axes.flat[-1].hist(df["ratio_x2"], bins=bins, alpha=0.6, label="x2")
+    axes.flat[-1].set_xscale("log")
     axes.flat[-1].axvline(1, color="k", lw=0.8)
     axes.flat[-1].set_title("block variance ratio")
     axes.flat[-1].legend()
