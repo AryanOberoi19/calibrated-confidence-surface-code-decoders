@@ -1,0 +1,208 @@
+{
+ "version": "r13_v1",
+ "seed": 20261117,
+ "shares": {
+  "train": 0.4,
+  "calibrate": 0.3,
+  "test": 0.3
+ },
+ "method": "per experiment: numpy default_rng([seed, first 8 bytes of sha256(key) as little-endian int]).permutation(shots); first 40% train, next 30% calibrate, rest test",
+ "experiments": {
+  "d3_at_q10_7/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "b81f9651c279fc839e0f78dae6bfd529dd2b58346199139b97119daa3db2cd9d"
+  },
+  "d3_at_q10_7/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "9a847c18400d843a86c0b77ed6429f6d92abd3473e3e507d2f36a9bcd4de3a7c"
+  },
+  "d3_at_q2_7/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "b147b00e99156099b523c47dfbf580187d3130ac2f16820ca4f8256a60e40371"
+  },
+  "d3_at_q2_7/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "87aa5c7168ac652840835400b8a224895a7b4a6e76d3accdbe91041ff55a64ff"
+  },
+  "d3_at_q4_5/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "d8c1580b9aec6ad94e9626a9fed9fb6b6a6cbe7a03a64b7f891ec598b00825bd"
+  },
+  "d3_at_q4_5/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "64f72602071d478fb40944f632d6efa7ab8f77894a65462e82efa75bd7b78260"
+  },
+  "d3_at_q4_9/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "0d32ff10fe5535da58eb4990eaf7a0df2d500a59970e0b89385f31192539e19e"
+  },
+  "d3_at_q4_9/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "5e60dadbca58a3656330dd88660cab92ea26d23cae7ac1c2cb62e0b1c76f2ea5"
+  },
+  "d3_at_q6_11/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "96896f1c565986aee8ca4f28d653469edbbd458f36a267fcfd60ade6620c912d"
+  },
+  "d3_at_q6_11/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "f3f2f50f3664468d5e4255781511db627f26a0ed4e30f7416dd10a6f579fea32"
+  },
+  "d3_at_q6_3/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "ee755384fd278cf1517d2b0cbf53918ca49eccb35b33c026a795fbd24e0413f7"
+  },
+  "d3_at_q6_3/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "b683e5b8fc52f0fc7bbe560d0243b4029fb877bef6087ca83505f1a577196a6e"
+  },
+  "d3_at_q6_7/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "e3db930648b8e0f9d087f335cb2dd896364b1ad0a66bdaa2ada979f11a43a216"
+  },
+  "d3_at_q6_7/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "874bb2f89a1a782c600318339d05005efa92bac79e0e5f3e5a441cefb4b9d36f"
+  },
+  "d3_at_q8_5/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "378a4fec715fab248e39fea3d3861728a0afe68e24d2b3864acb33d02f0b4177"
+  },
+  "d3_at_q8_5/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "5df2452c434a42c9b7bbc4c2e5cb4bf9591ca8b45dbdda3d3a32559e767b326a"
+  },
+  "d3_at_q8_9/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "d21374d0e42c1f0627e9cca699c757b7aa423642885f232536cb26724f8ce432"
+  },
+  "d3_at_q8_9/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "63b40d788850aa616a5aa19eacec1fafe1a9ff46af9503fd8d4c7b4b9ce9aafe"
+  },
+  "d5_at_q4_7/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "457004a0d7478bb64be70b29318564bda0b4e7305a87bb23a5489c9ddfa4912c"
+  },
+  "d5_at_q4_7/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "ecefa85f16684ed23d826697720672d50ea695ab7813fcc23f52becf968eb68e"
+  },
+  "d5_at_q6_5/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "ef5d5470018d939c2725e9cc1f0f2378b6a640071a9bf0c26138b09f0c33d80e"
+  },
+  "d5_at_q6_5/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "41a3866a57485f7b52fad6544650983fff5078f790ff7ea6b57f38543a09d290"
+  },
+  "d5_at_q6_9/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "fb92ce65b454a35f8ab7f322af7256e5519f78b7b4120d66c60afa4ad21100ea"
+  },
+  "d5_at_q6_9/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "a5f3ec64094954e761f4b7aa63e2f3da06ee063c869fd454be5127cb1f174e0b"
+  },
+  "d5_at_q8_7/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "4eac11b8f46e6c5b264d40af8ed70581393dc7522dd33cf699e48b162b6a9800"
+  },
+  "d5_at_q8_7/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "381e87b50b725a6c899a53f8badb4e2c988e86aa76c05a61f261518c616892cd"
+  },
+  "d7_at_q6_7/X/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "81545339922ddf321361e2e618a39ec8e87a2dbfe1c82110015e535b123297c1"
+  },
+  "d7_at_q6_7/Z/r13": {
+   "shots": 50000,
+   "train": 20000,
+   "calibrate": 15000,
+   "test": 15000,
+   "sha256": "2581c85db75565b6d889bdbad70a884691911154bb99e8d8c4f7f7d102134206"
+  }
+ }
+}
