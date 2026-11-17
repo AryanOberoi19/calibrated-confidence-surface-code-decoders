@@ -101,6 +101,9 @@ def main():
                 x = g[g.alpha == a]
                 cells.append(fmt(x.cal_needed.iloc[0], x.zero_error_lower_bound.iloc[0]) + (f" (k {x.keep.iloc[0]:.2f})" if len(x) else "") if len(x) else "-")
             L.append(f"| {d} | {r} | " + " | ".join(cells) + " |")
+        allg = c[(c.method == m_) & (c.prior == p_)][["distance", "rounds"]].drop_duplicates()
+        none = [f"d={d} r={r}" for d, r in allg.itertuples(index=False) if v[(v.distance == d) & (v.rounds == r)].empty]
+        L += ["", "Not certifiable at any keep fraction for any alpha listed (R(k) >= 0.01 everywhere): " + (", ".join(none) or "none") + "."]
         L.append("")
     v = best[(best.method == "mwpm_gap") & (best.prior == "rl") & (best.rounds == 10)]
     L += ["## Wall-clock lower bound (MWPM gap, RL prior, r = 10)", "",
@@ -122,12 +125,15 @@ def main():
     a_grid = np.array(ALPHAS)
     for k, (d, g) in enumerate(best[(best.method == "mwpm_gap") & (best.prior == "rl") & (best.rounds == 10)].groupby("distance")):
         g = g.set_index("alpha").reindex(a_grid)
-        ax.loglog(a_grid, g.cal_needed, "o-", color=f"C{k}", label=f"d = {d}, r = 10")
+        ax.loglog(a_grid, g.cal_needed, "-", color=f"C{k}", label=f"d = {d}, r = 10")
+        lb = g.zero_error_lower_bound.fillna(0).astype(bool).values
+        ax.loglog(a_grid[~lb], g.cal_needed.values[~lb], "o", color=f"C{k}")
+        ax.loglog(a_grid[lb], g.cal_needed.values[lb], "o", mfc="white", color=f"C{k}")
     ax.loglog(a_grid, [zero_error_kept(a, DELTA) for a in a_grid], "k--", lw=0.8, label="zero-error bound, keep all (≈ 3/alpha)")
     ax.axhline(N_CAL_NOW, color="grey", lw=0.8, ls=":", label="15,000 Calibrate shots now")
     ax.set_xlabel("alpha")
     ax.set_ylabel("calibration shots needed")
-    ax.set_title("Calibration budget (MWPM gap, RL prior)")
+    ax.set_title("Calibration budget (MWPM gap, RL prior); open = lower bound")
     ax.legend(fontsize=8)
     fig.tight_layout()
     fig.savefig(RES / "p7_budget.png", dpi=200)
