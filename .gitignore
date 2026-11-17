@@ -1,6 +1,7 @@
 # raw data (5.7 GB archive) and anything extracted from it stay out of git
 data/raw/*
 !data/raw/.gitkeep
+data/raw.zip
 data/extracted/
 results/cache/
 
