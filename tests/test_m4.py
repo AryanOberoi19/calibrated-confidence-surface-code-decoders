@@ -63,3 +63,25 @@ def test_keep_grid_and_thresholds():
     lams = thresholds(s)
     assert len(lams) == len(KEEP_GRID) and lams[-1] == -np.inf
     assert np.mean(s >= lams[list(KEEP_GRID).index(0.3)]) == pytest.approx(0.3, abs=0.02)
+
+
+def test_budget_zero_error_bound_matches_the_closed_form():
+    from qeccal.guarantees.budget import kept_needed, zero_error_kept
+    assert zero_error_kept(1e-3, 0.05) == 2995                    # ln 20 / -ln 0.999 = 2994.2, rounded up
+    assert kept_needed(0.0, 1e-3, 0.05) == 2995
+
+
+def test_budget_needs_true_risk_below_alpha():
+    from qeccal.guarantees.budget import kept_needed
+    assert kept_needed(1e-3, 1e-3, 0.05) is None
+    assert kept_needed(2e-3, 1e-3, 0.05) is None
+
+
+def test_budget_kept_needed_certifies_with_probability_one_half():
+    from scipy.stats import binom
+    from qeccal.guarantees.budget import kept_needed, max_certifiable_errors
+    for alpha, risk in ((1e-2, 5e-3), (1e-3, 2e-4), (1e-4, 5e-5)):
+        m = kept_needed(risk, alpha, 0.05)
+        assert m is not None and binom.cdf(max_certifiable_errors(m, alpha, 0.05), m, risk) >= 0.5
+        assert binom.cdf(max_certifiable_errors(m // 2, alpha, 0.05), m // 2, risk) < 0.5   # half as many is not enough
+    assert max_certifiable_errors(100, 1e-3, 0.05) == -1                                  # 100 shots cannot certify 1e-3
