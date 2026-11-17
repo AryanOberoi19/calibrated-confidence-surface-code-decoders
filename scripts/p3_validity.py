@@ -256,7 +256,7 @@ def summarize(keys):
     L.append("")
     (RES / "p3_validity.md").write_text("\n".join(L))
 
-    fig, axes = plt.subplots(1, 2, figsize=(11, 4))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 4.6))
     bins = np.linspace(0, max(0.3, p1.rate.max()), 61)
     for rule in PART1_RULES:
         axes[0].hist(p1[(p1.rule == rule) & (p1.certified > 0)].rate, bins=bins, alpha=0.6, label=rule)
@@ -281,9 +281,9 @@ def summarize(keys):
             labels.append(f"{r}\n{a:g}")
             pos += 1
         pos += 0.5
-    axes[1].set_xticks(ticks, labels, fontsize=6)
+    axes[1].set_xticks(ticks, labels, fontsize=6, rotation=90)
     axes[1].set_ylabel("significantly exceeding alpha (%)")
-    axes[1].set_title("Part 2: 200 resplits (box) vs committed split (*), MWPM gap RL prior")
+    axes[1].set_title("Part 2: 200 resplits (box), committed (*); MWPM gap, RL")
     fig.tight_layout()
     fig.savefig(RES / "p3_validity.png", dpi=200)
     print("\n".join(L[:40]))
