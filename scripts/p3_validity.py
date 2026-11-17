@@ -17,7 +17,9 @@ The committed split is computed by the same code and checked row by row against 
 Acceptance: the committed split's exceed and significant shares lie inside the 5th-95th percentile range of the
 resplits in at least 90% of table cells; otherwise the paper reports resplit medians.
 
-Seeds: [20261117, 3, part, experiment index, combo index] (rerun: [20261117, 3, 9, exp, combo, alpha index]).
+Seeds: [20261117, 3, part, experiment index, combo index] (rerun: [20261117, 3, 9, exp, combo, alpha index]);
+the A5 baselines in Part 1 draw from their own stream [20261117, 3, 4, exp, combo], so the ltt and plugin
+rows are unchanged by adding them.
 
     python scripts/p3_validity.py [--workers 4]      # resumable: per-experiment results in results/cache/p3/
 """
@@ -33,6 +35,7 @@ from qeccal.calibration import CALIBRATORS, score_from_q
 from qeccal.data import list_experiments, split_indices
 from qeccal.guarantees import KEEP_GRID, thresholds
 from qeccal.guarantees.validity import RULES, band_counts, population_risk, violation_rate
+import qeccal.guarantees.baselines  # noqa: F401  (registers bonferroni, sgr, ltt_hb in RULES)
 from qeccal.soft.cache import cache_path, load
 
 REPO = pathlib.Path(__file__).resolve().parents[1]
@@ -42,7 +45,7 @@ SEED = 20261117
 ALPHAS = (1e-3, 3e-3, 1e-2, 3e-2, 1e-1)          # as M4
 DELTA = 0.05
 COMBOS = [("mwpm_gap", "si1000"), ("mwpm_gap", "rl"), ("exact", "si1000"), ("exact", "rl"), ("bm_gap", "rl"), ("nn", "rl")]
-CERT_RULES = ("ltt",)
+CERT_RULES = ("ltt", "bonferroni", "sgr", "ltt_hb")          # A5 added the three baselines
 PART1_RULES = CERT_RULES + ("plugin",)
 P2_RULES = ("ltt", "plugin", "naive_raw", "naive_platt")
 DRAWS, RERUN_DRAWS, RESPLITS = 2000, 20000, 200
@@ -120,17 +123,18 @@ def run(job):
         s_p, w_p = s[pop], wrong[pop]
         # Part 1
         nb, eb = band_counts(s_p, w_p, lams)
-        rng = np.random.default_rng([SEED, 3, 1, xi, ci])
+        rng = np.random.default_rng([SEED, 3, 1, xi, ci])            # ltt and plugin (as in the first A4 run)
+        rng_b = np.random.default_rng([SEED, 3, 4, xi, ci])          # A5 baselines: own stream
         risk = population_risk(nb, eb)
         for a_i, a in enumerate(ALPHAS):
             for rule in PART1_RULES:
-                r = violation_rate(nb, eb, a, DELTA, ca.size, DRAWS, rng, rule=rule)
+                r = violation_rate(nb, eb, a, DELTA, ca.size, DRAWS, rng if rule in ("ltt", "plugin") else rng_b, rule=rule)
                 row = {"key": e.key, "distance": e.distance, "rounds": e.rounds, "method": method, "prior": prior,
                        "alpha": a, "rule": rule, **r, "rate": r["violations"] / r["draws"],
                        "min_risk": float(np.nanmin(risk)), "flagged": 0, "rerun_draws": 0, "rerun_violations": 0}
                 if rule in CERT_RULES and row["rate"] > BOUND:
                     rr = violation_rate(nb, eb, a, DELTA, ca.size, RERUN_DRAWS,
-                                        np.random.default_rng([SEED, 3, 9, xi, ci, a_i]), rule=rule)
+                                        np.random.default_rng([SEED, 3, 9, xi, ci, a_i, CERT_RULES.index(rule)]), rule=rule)
                     row.update(flagged=1, rerun_draws=rr["draws"], rerun_violations=rr["violations"])
                 p1_rows.append(row)
         # Part 2
@@ -258,7 +262,7 @@ def summarize(keys):
 
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.6))
     bins = np.linspace(0, max(0.3, p1.rate.max()), 61)
-    for rule in PART1_RULES:
+    for rule in ("ltt", "plugin"):
         axes[0].hist(p1[(p1.rule == rule) & (p1.certified > 0)].rate, bins=bins, alpha=0.6, label=rule)
     axes[0].axvline(DELTA, color="k", lw=0.8)
     axes[0].axvline(BOUND, color="k", lw=0.8, ls="--")
