@@ -9,6 +9,9 @@ Bound for a certified rule: violation rate <= 0.0646; flagged cells rerun with 2
 | rule | cells | cells with a certificate in some draw | max violation rate | 99th percentile | cells above 0.05 | flagged (> bound) | bugs after rerun |
 |---|---|---|---|---|---|---|---|
 | ltt | 5100 | 1753 | 0.0515 | 0.0260 | 1 | 0 | 0 |
+| bonferroni | 5100 | 1696 | 0.0040 | 0.0015 | 0 | 0 | 0 |
+| sgr | 5100 | 1721 | 0.0150 | 0.0050 | 0 | 0 | 0 |
+| ltt_hb | 5100 | 1742 | 0.0225 | 0.0095 | 0 | 0 | 0 |
 | plugin | 5100 | 2051 | 0.6470 | 0.4660 | 714 | 666 | (not certified) |
 
 **Part 1 acceptance: PASS** (0 certified-rule cells flagged, 0 still above 0.0546 after the rerun).
